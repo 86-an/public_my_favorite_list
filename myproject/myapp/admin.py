@@ -3,7 +3,6 @@ from import_export.admin import ImportExportModelAdmin
 from .models import Anime, Cast, Staff
 from .resource import AnimeResource
 
-# Register your models here.
 @admin.register(Anime)
 class AnimeAdmin(ImportExportModelAdmin):
     resource_class = AnimeResource
@@ -19,5 +18,3 @@ class CastAdmin(admin.ModelAdmin):
 class StaffAdmin(admin.ModelAdmin):
     list_display = ('name', 'roletext', 'anime')
     search_fields = ('name', 'roletext')
-
-
