@@ -1,26 +1,34 @@
 from django.db import models
 
-# モデルを定義
+# アニメモデル
 class Anime(models.Model):
-    anime_id = models.CharField(max_length=200, verbose_name='アニメID')
+    anime_id = models.CharField(max_length=200, unique=True, verbose_name='アニメID')
     title = models.CharField(max_length=200, verbose_name='タイトル')
-    title_kana = models.CharField(max_length=200, verbose_name='タイトルカナ')
+    title_kana = models.CharField(max_length=200, blank=True, null=True, verbose_name='タイトルカナ')  # 空データを許容
     media = models.CharField(max_length=200, verbose_name='メディア')
-    episodes_count = models.IntegerField(verbose_name='話数')  # max_lengthを削除しました
-    season_year = models.IntegerField(verbose_name='年')
-    season_name = models.CharField(max_length=200, verbose_name='季節')
-    # ジャンル、評価、視聴済みフラグなどを追加する場合の例:
-    # genre = models.CharField(max_length=200)
-    # rating = models.FloatField()
-    # watched = models.BooleanField()
+    episodes_count = models.IntegerField(verbose_name='話数', default=0)  # デフォルト値で空を防ぐ
+    season_year = models.IntegerField(verbose_name='年', default=0)  # デフォルト値で整合性維持
+    season_name = models.CharField(max_length=200, blank=True, null=True, verbose_name='季節')  # 空データを許容
 
+    def __str__(self):
+        return self.title
+
+# キャストモデル
 class Cast(models.Model):
-    cast_id = models.CharField(max_length=200, blank=True, null=True, verbose_name='キャストID')  # 空のデータを許容
+    anime_cast_id = models.CharField(max_length=200, default='unknown')
     name = models.CharField(max_length=200, blank=True, null=True, verbose_name='声優名')  # 空のデータを許容
-    anime = models.ForeignKey(Anime, on_delete=models.CASCADE, related_name='cast')
-    
+    anime_id = models.ForeignKey(Anime, to_field='anime_id', on_delete=models.CASCADE, related_name='cast')  # anime_idとリレーション
+
+    def __str__(self):
+        return self.name if self.name else "不明なキャスト"
+
+# スタッフモデル
 class Staff(models.Model):
+    anime_staff_id = models.CharField(max_length=200, default='unknown')
     staff_id = models.CharField(max_length=200, blank=True, null=True, verbose_name='スタッフID')  # 空のデータを許容
     name = models.CharField(max_length=200, blank=True, null=True, verbose_name='スタッフ名')  # 空のデータを許容
-    roletext = models.CharField(max_length=200, blank=True, null=True, verbose_name='役割')  # 空のデータを許容
-    anime = models.ForeignKey(Anime, on_delete=models.CASCADE, related_name='staff')
+    roletext = models.CharField(max_length=200, blank=True, null=True, verbose_name='役割')  # 空データを許容
+    anime_id = models.ForeignKey(Anime, to_field='anime_id', on_delete=models.CASCADE, related_name='staff')
+
+    def __str__(self):
+        return f"{self.name} ({self.roletext})" if self.name else "不明なスタッフ"
