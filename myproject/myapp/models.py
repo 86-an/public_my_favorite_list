@@ -13,16 +13,16 @@ class Anime(models.Model):
     def __str__(self):
         return self.title
 
-# キャストモデル
+# キャストモデル リレーション多対多
 class Cast(models.Model):
-    anime_cast_id = models.CharField(max_length=200, default='unknown')
+    anime_id = models.CharField(max_length=200, unique=True, verbose_name='アニメID', null=True)
     name = models.CharField(max_length=200, blank=True, null=True, verbose_name='声優名')  # 空のデータを許容
-    anime_id = models.ForeignKey(Anime, to_field='anime_id', on_delete=models.CASCADE, related_name='cast')  # anime_idとリレーション
+    animes = models.ManyToManyField('Anime', related_name='casts')  # 多対多リレーション
 
     def __str__(self):
         return self.name if self.name else "不明なキャスト"
 
-# スタッフモデル
+# スタッフモデル　リレーション
 class Staff(models.Model):
     anime_staff_id = models.CharField(max_length=200, default='unknown')
     staff_id = models.CharField(max_length=200, blank=True, null=True, verbose_name='スタッフID')  # 空のデータを許容

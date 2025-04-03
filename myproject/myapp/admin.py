@@ -12,8 +12,12 @@ class AnimeAdmin(ImportExportModelAdmin):
 @admin.register(Cast)
 class CastAdmin(ImportExportModelAdmin):
     resource_class = CastResource
-    list_display = ('name', 'anime_id')
-    search_fields = ('name','anime_id__title')
+    list_display = ('name', 'get_animes')  # 多対多リレーション用のカスタムメソッド
+    search_fields = ('name', 'animes__title')  # 多対多リレーションのタイトルで検索可能
+
+    def get_animes(self, obj):
+        return ", ".join([anime.title for anime in obj.animes.all()])
+    get_animes.short_description = 'Animes'
 
 @admin.register(Staff)
 class StaffAdmin(ImportExportModelAdmin):

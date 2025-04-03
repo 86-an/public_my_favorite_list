@@ -20,7 +20,6 @@ class AnimeResource(resources.ModelResource):
 
 
 class CastResource(resources.ModelResource):
-    anime_cast_id = fields.Field(attribute='anime_cast_id', column_name='anime_cast_id')
     anime_id = fields.Field(attribute='anime_id', column_name='anime_id')  # カラム名指定
     name = fields.Field(attribute='name', column_name='name')
     
@@ -29,14 +28,14 @@ class CastResource(resources.ModelResource):
             del row['import_type']
             logger.info("Removed 'import_type' from row.")
         try:
-            row['anime_id'] = Anime.objects.get(anime_id=row['anime_id'])
+            row['anime_id'] = Anime.objects.get(anime_id=row['anime_id']).anime_id
         except Anime.DoesNotExist:
             raise ValueError(f"Anime with anime_id '{row['anime_id']}' does not exist.")
             
     class Meta:
         model = Cast
-        fields = ('anime_cast_id', 'anime_id', 'name')  # 'id'は含めない
-        import_id_fields = ('anime_cast_id', )  # anime_cast_idを照合基準に
+        fields = ('anime_id', 'name')  # 'id'は含めない
+        import_id_fields = ('anime_id', )  # anime_cast_idを照合基準に
 
 
 class StaffResource(resources.ModelResource):
