@@ -1,0 +1,11 @@
+{% extends 'base.html' %} <!-- 親テンプレートを継承 -->
+
+{% block title %}Book Form{% endblock %} <!-- タイトルを指定 -->
+
+{% block content %} <!-- コンテンツを挿入 -->
+<h1>Book フォーム</h1>
+<form method="post">
+    {% csrf_token %}
+    
+<a href="{% url 'book_list' %}" class="btn btn-secondary mt-3">キャンセル</a>
+{% endblock %}

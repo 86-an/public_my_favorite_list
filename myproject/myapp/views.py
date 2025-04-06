@@ -18,15 +18,19 @@ def book_detail(request, pk=None):
     return render(request, 'myapp/book_detail.html', {'book' : book})
 
 def book_form(request, pk=None):
-    if pk:
+    if pk:  # pkが指定されている場合、編集モード
         book = get_object_or_404(Book, pk=pk)
-    else:
+        form = BookForm(instance=book)
+    else:  # pkがない場合、新規作成モード
         book = None
         form = BookForm()
-    
-    if request.method == 'POST':
+
+    if request.method == 'POST':  # POSTリクエストの場合、フォームを保存
         form = BookForm(request.POST, instance=book)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('book_list'))
+            return HttpResponseRedirect(reverse('book_list'))  # リダイレクト
+
+    # GETリクエストの場合、フォームを表示
+    return render(request, 'myapp/book_form.html', {'form': form})
         

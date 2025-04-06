@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/book_detail.css' %}"> <!-- 修正済み -->
+</head>
+<body>
+    <h1>{{ book.title }}</h1>
+    <p>著者: {{ book.author }}</p>
+    <p>絵師: {{ book.designer }}</p>
+    <p>巻数: {{ book.series }}</p>
+    <p>評価: {{ book.value }}</p>
+    <p>分類: {{ book.types.all|join:", " }}</p>
+    <p>ジャンル: {{ book.genres.all|join:", " }}</p>
+    <p>状態: {{ book.statuses.all|join:", " }}</p>
+    <a href="../form/{{ book.id }}/">編集する</a>
+    <a href="../">戻る</a>
+    
+</body>
+</html>

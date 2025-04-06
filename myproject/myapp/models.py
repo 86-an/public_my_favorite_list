@@ -66,7 +66,7 @@ class Value(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=200, blank=True, null=True, verbose_name='タイトル')
     author = models.CharField(max_length=200, blank=True, null=True, verbose_name='著者')
-    desigher = models.CharField(max_length=200, blank=True, null=True, verbose_name='絵師')
+    designer = models.CharField(max_length=200, blank=True, null=True, verbose_name='絵師')
     type = models.ManyToManyField(BookType, verbose_name='分類')
     genre = models.ManyToManyField(BookGenre, verbose_name='ジャンル')
     series = models.IntegerField(verbose_name='巻数', default=1)

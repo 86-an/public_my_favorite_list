@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'import_export',
-    'django_extensions',
+    'django_bootstrap5',
     'myapp',
 ]
 
