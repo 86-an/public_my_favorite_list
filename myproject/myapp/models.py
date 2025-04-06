@@ -32,3 +32,45 @@ class Staff(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.roletext})" if self.name else "不明なスタッフ"
+
+
+#book中間テーブル
+class BookType(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name='分類')
+    
+    def __str__(self):
+        return self.name
+
+
+class BookGenre(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name='ジャンル')
+    
+    def __str__(self):
+        return self.name
+
+
+class BookStatus(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name='状態')
+    
+    def __str__(self):
+        return self.name
+    
+
+class Value(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name='評価')
+    
+    def __str__(self):
+        return self.name
+    
+#bookモデル    
+class Book(models.Model):
+    title = models.CharField(max_length=200, blank=True, null=True, verbose_name='タイトル')
+    author = models.CharField(max_length=200, blank=True, null=True, verbose_name='著者')
+    desigher = models.CharField(max_length=200, blank=True, null=True, verbose_name='絵師')
+    type = models.ManyToManyField(BookType, verbose_name='分類')
+    genre = models.ManyToManyField(BookGenre, verbose_name='ジャンル')
+    series = models.IntegerField(verbose_name='巻数', default=1)
+    status = models.ManyToManyField(BookStatus, verbose_name='状態')
+    value = models.ManyToManyField(Value, verbose_name='評価')
+
+

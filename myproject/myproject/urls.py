@@ -21,4 +21,9 @@ from myapp import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    #bookの関連
+    path('book/', views.book_list, name='book_list'),
+    path('book/<int:pk>/', views.book_detail, name='book_detail'),
+    path('book/form/', views.book_form, name='book_form'),
+    path('book/form/<int:pk>/', views.book_form, name='book_edit'),
 ]

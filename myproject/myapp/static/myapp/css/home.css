@@ -1,0 +1,51 @@
+h1 {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 26px;
+	text-align: center;
+}
+
+h1::before,
+h1::after {
+	content: '';
+	width: 70px;
+	height: 3px;
+	background-color: #e3bf00;
+}
+
+h1::before {
+	margin-right: 20px;
+}
+h1::after {
+	margin-left: 20px;
+}
+
+.text_picture {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.text_picture .item {
+    text-align: center;
+}
+
+.text_picture img {
+    width: 200px; /* 画像の幅 */
+    height: 200px; /* 画像の高さ */
+    border-radius: 90%; /* 画像を丸くする */
+    object-fit: cover; /* 画像を枠内に収める */
+    margin-bottom: 10px; /* テキストとの間隔 */
+}
+
+.text_picture a {
+    text-decoration: none;
+    font-size: 18px;
+    color: #333;
+}
+
+.text_picture a:hover {
+    color: #007BFF; /* ホバー時の色 */
+}
