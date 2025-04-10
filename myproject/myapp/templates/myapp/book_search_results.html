@@ -1,0 +1,21 @@
+<html lang='ja'>
+<head>
+    {% load static %}
+    <meta charset = 'UTF-8'>
+    <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0'>
+    <title>book_search</title>
+    <link rel = 'stylesheet' href = '{% static "myapp/css/book_search.css" %}'>
+</head>
+<body>
+    <h1>検索結果</h1>
+    <p>検索キーワード: "{{ search_query }}"</p>
+    {% if results %}
+        <ul>
+            {% for book in results %}
+                <li>{{ book.title }} - {{ book.author }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>該当するデータが見つかりませんでした。</p>
+    {% endif %}
+</body>

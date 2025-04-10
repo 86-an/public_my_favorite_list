@@ -21,31 +21,62 @@ h1::after {
 	margin-left: 20px;
 }
 
-.text_picture {
+
+.container {
     display: flex;
     justify-content: space-around;
-    align-items: center;
+    align-items: flex-start;
     margin-top: 20px;
+    padding: 20px;
 }
 
-.text_picture .item {
+.group {
     text-align: center;
+    margin: 15px;
 }
 
-.text_picture img {
-    width: 200px; /* 画像の幅 */
-    height: 200px; /* 画像の高さ */
-    border-radius: 90%; /* 画像を丸くする */
-    object-fit: cover; /* 画像を枠内に収める */
-    margin-bottom: 10px; /* テキストとの間隔 */
+.group img {
+    width: 150px; /* 画像の幅 */
+    height: 150px; /* 画像の高さ */
+    border-radius: 50%; /* 画像を丸くする */
+    object-fit: cover; /* 枠内に収める */
+    margin-bottom: 10px;
+    border: 2px solid #fff; /* 白い枠線を追加 */
 }
 
-.text_picture a {
-    text-decoration: none;
-    font-size: 18px;
-    color: #333;
+.group .button {
+    display: block;
+    margin: 10px auto;
+    padding: 12px 18px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007BFF; /* ボタンのデフォルト色 */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* ホバー時のアニメーション */
 }
 
-.text_picture a:hover {
-    color: #007BFF; /* ホバー時の色 */
+.group .button:nth-child(3n+1):hover {
+    background-color: skyblue;
+}
+
+.group .button:nth-child(3n+1):active {
+    background-color: blue;
+}
+
+.group .button:nth-child(3n+2):hover {
+    background-color: lightgreen;
+}
+
+.group .button:nth-child(3n+2):active {
+    background-color: green;
+}
+
+.group .button:nth-child(3n+3):hover {
+    background-color: orchid;
+}
+
+.group .button:nth-child(3n+3):active {
+    background-color: purple;
 }

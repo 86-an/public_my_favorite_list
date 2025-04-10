@@ -67,10 +67,27 @@ class Book(models.Model):
     title = models.CharField(max_length=200, blank=True, null=True, verbose_name='タイトル')
     author = models.CharField(max_length=200, blank=True, null=True, verbose_name='著者')
     designer = models.CharField(max_length=200, blank=True, null=True, verbose_name='絵師')
-    type = models.ManyToManyField(BookType, verbose_name='分類')
-    genre = models.ManyToManyField(BookGenre, verbose_name='ジャンル')
+    type = models.ManyToManyField(BookType, verbose_name='分類', blank=True, related_name='books_type')
+    genre = models.ManyToManyField(BookGenre, verbose_name='ジャンル', blank=True, related_name='books_genre')
     series = models.IntegerField(verbose_name='巻数', default=1)
-    status = models.ManyToManyField(BookStatus, verbose_name='状態')
-    value = models.ManyToManyField(Value, verbose_name='評価')
+    status = models.ManyToManyField(BookStatus, verbose_name='状態', related_name='books_status')
+    value = models.ManyToManyField(Value, verbose_name='評価', blank=True, related_name='books_value')
 
+
+#音楽の中間モデル
+class MusicStatus(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name='状態')
+    def __str__(self):
+        return self.name
+
+#音楽モデル
+class Music(models.Model):
+    song_name = models.CharField(max_length=200, blank=True, null=True, verbose_name='曲名')
+    singger = models.CharField(max_length=200, blank=True, null=True, verbose_name='歌手')
+    writer = models.CharField(max_length=200, blank=True, null=True, verbose_name='作曲者')
+    sing_writer = models.CharField(max_length=200, blank=True, null=True, verbose_name='作詞家')
+    editor = models.CharField(max_length=200, blank=True, null=True, verbose_name='編曲者')
+    song_write = models.CharField(max_length=2000, blank=True, null=True, verbose_name='歌詞')
+    status = models.ManyToManyField(MusicStatus, verbose_name='状態', blank=True, related_name='music_status')
+    value = models.ManyToManyField(Value, verbose_name='評価', blank=True, related_name='music_value')
 

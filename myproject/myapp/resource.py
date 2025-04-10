@@ -1,5 +1,5 @@
 from import_export import resources, fields
-from .models import Anime, Cast, Staff
+from .models import Anime, Cast, Staff, Music
 import logging
 
 logger = logging.getLogger(__name__)
@@ -58,3 +58,18 @@ class StaffResource(resources.ModelResource):
         model = Staff
         fields = ('anime_staff_id', 'anime_id', 'staff_id', 'name', 'roletext')
         import_id_fields = ('anime_staff_id',)  
+
+class MusicResource(resources.ModelResource):
+    song_name = fields.Field(attribute='song_name', column_name='曲名')
+    singger = fields.Field(attribute='singger', column_name='歌手名')
+    writer = fields.Field(attribute='writer', column_name='作詞者名')
+    sing_writer = fields.Field(attribute='sing_writer', column_name='作曲者名')
+    editor = fields.Field(attribute='editor', column_name='編曲者名')
+    song_write = fields.Field(attribute='song_write', column_name='歌い出し')
+    
+    class Meta:
+        model = Music
+        fields = ('song_name', 'singger', 'writer', 'sing_writer', 'editor', 'song_write')
+        import_id_fields = ('song_name',)
+    
+    

@@ -1,8 +1,9 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
-from .models import Anime, Cast, Staff, BookType, BookGenre, BookStatus, Value, Book
-from .resource import AnimeResource, CastResource, StaffResource
+from .models import Anime, Cast, Staff, BookType, BookGenre, BookStatus, Value, Book, Music
+from .resource import AnimeResource, CastResource, StaffResource, MusicResource
 
+#anime関連
 @admin.register(Anime)
 class AnimeAdmin(ImportExportModelAdmin):
     resource_class = AnimeResource
@@ -25,6 +26,8 @@ class StaffAdmin(ImportExportModelAdmin):
     list_display = ('name', 'roletext', 'anime_id')
     search_fields = ('name', 'roletext', 'anime_id__title')
 
+
+#book関連
 @admin.register(BookType)
 class BookTypeAdmin(admin.ModelAdmin):
     list_display = ['name']
@@ -57,3 +60,9 @@ class BookAdmin(admin.ModelAdmin):
     def display_statuses(self, obj):
         return ", ".join([status.name for status in obj.status.all()])
     display_statuses.short_description = '状態'
+
+@admin.register(Music)
+class MusicAdmin(ImportExportModelAdmin):
+    resource_class = MusicResource
+    list_display = ['song_name', 'singger', 'writer', 'sing_writer', 'editor', 'song_write']
+    

@@ -9,26 +9,29 @@
 </head>
 <body>
     <h1>マイリスト</h1>
-    <div class = "text_picture">
-        <div class = "item">
-            <img src="{% static 'myapp/image/anime.png' %}" alt="アニメ">
-            <p>アニメリスト</p>
+    <div class = "container">
+        <!-- アニメ -->
+        <div class = "group">
+            <img src = "{% static 'myapp/image/anime.png' %}" alt = "アニメ">
+            <button class = "button">一覧  &amp; 編集</button>
+            <button class = "button">検索</button>
+            <button class = "button">新規登録</button>
         </div>
-        <div class = "item">
-            <img src="{% static 'myapp/image/book.png' %}" alt="本">
-            <p>本のリスト</p>
+
+        <!-- 本 -->
+        <div class = "group">
+            <img src = "{% static 'myapp/image/book.png' %}" alt = "本">
+            <a href="{% url 'book_list' %}" class = "button">一覧  &amp; 編集</button>
+            <a href="{% url 'book_search' %}" class = "button">検索</button>
+            <a href="{% url 'book_form' %}" class = "button">新規登録</button>
         </div>
-        <div class = "item">
-            <img src="{% static 'myapp/image/music.png' %}" alt="音楽">
-            <p>音楽のリスト</p>
-        </div>
-        <div class = "item">
-            <img src="{% static 'myapp/image/list.png' %}" alt="リスト">
-            <p>リスト</p>
-        </div>
-        <div class = "item">
-            <img src="{% static 'myapp/image/subscribe.png' %}" alt="本">
-            <p>登録</p>
+
+        <!-- 音楽 -->
+        <div class = "group">
+            <img src = "{% static 'myapp/image/music.png' %}" alt = "音楽">
+            <button class = "button">一覧  &amp; 編集</button>
+            <button class = "button">検索</button>
+            <button class = "button">新規登録</button>
         </div>
     </div>
 </body>

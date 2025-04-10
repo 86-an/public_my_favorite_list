@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/music_list.css' %}"> <!-- 修正済み -->
+</head>
+<body>
+    <h1>音楽のリスト</h1>
+    <ul>
+        {% for music in musics %}
+        <li>
+            <a href="{{ music.id }}/">{{ music.song_name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="form/">新しい音楽を追加</a>
+</body>
+</html>

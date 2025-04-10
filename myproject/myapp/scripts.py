@@ -1,4 +1,4 @@
-from myapp.models import BookType, BookGenre, BookStatus, Value
+from myapp.models import BookType, BookGenre, BookStatus, Value, MusicStatus
 
 # Valueのデータ登録
 for name in ['SS', 'S', 'A', 'B', 'C', 'D']:
@@ -16,3 +16,7 @@ for name in ['推理・ミステリー', '青春', '恋愛', 'SF(サイエンス
 # BookStatusのデータ登録
 for name in ['未読', '読書中', '読了', '購入済み', '気になる']:
     BookStatus.objects.get_or_create(name=name)
+
+#MusicStatusのデータ登録
+for name in ['未視聴', '視聴中', '視聴済み', '気になる']:
+    MusicStatus.objects.get_or_create(name=name)

@@ -1,9 +1,9 @@
 {% extends 'base.html' %} <!-- 親テンプレートを継承 -->
 
-{% block title %}Book Form{% endblock %} <!-- タイトルを指定 -->
+{% block title %}Music Form{% endblock %} <!-- タイトルを指定 -->
 
 {% block content %} <!-- コンテンツを挿入 -->
-<h1>Book フォーム</h1>
+<h1>音楽 フォーム</h1>
 <form method="post">
     {% csrf_token %}
     <div class="mb-3">
@@ -34,6 +34,6 @@
         </div>
     {% endfor %}
     <button type="submit" class="btn btn-primary">保存</button>
-    <a href="{% url 'book_list' %}" class="btn btn-secondary">キャンセル</a>
+    <a href="{% url 'music_list' %}" class="btn btn-secondary">キャンセル</a>
 </form>
 {% endblock %}

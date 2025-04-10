@@ -4,20 +4,74 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="{% static 'myapp/css/book_detail.css' %}"> <!-- 修正済み -->
+    <title>Book Detail</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/book_detail.css' %}">
 </head>
 <body>
     <h1>{{ book.title }}</h1>
     <p>著者: {{ book.author }}</p>
     <p>絵師: {{ book.designer }}</p>
     <p>巻数: {{ book.series }}</p>
-    <p>評価: {{ book.value }}</p>
-    <p>分類: {{ book.types.all|join:", " }}</p>
-    <p>ジャンル: {{ book.genres.all|join:", " }}</p>
-    <p>状態: {{ book.statuses.all|join:", " }}</p>
-    <a href="../form/{{ book.id }}/">編集する</a>
-    <a href="../">戻る</a>
+
+    <!-- 評価 -->
+    <p>評価: 
+        {% with book.value.all as value_list %}
+            {% if value_list %}
+                {{ value_list|join:", " }}
+            {% else %}
+                評価はありません
+            {% endif %}
+        {% endwith %}
+    </p>
+
+    <!-- 分類 -->
+    <p>分類: 
+        {% with book.type.all as type_list %}
+            {% if type_list %}
+                {{ type_list|join:", " }}
+            {% else %}
+                分類はありません
+            {% endif %}
+        {% endwith %}
+    </p>
+
+    <!-- ジャンル -->
+    <p>ジャンル: 
+        {% with book.genre.all as genre_list %}
+            {% if genre_list %}
+                {{ genre_list|join:", " }}
+            {% else %}
+                ジャンルはありません
+            {% endif %}
+        {% endwith %}
+    </p>
+
+    <!-- 状態 -->
+    <p>状態: 
+        {% with book.status.all as status_list %}
+            {% if status_list %}
+                {{ status_list|join:", " }}
+            {% else %}
+                状態はありません
+            {% endif %}
+        {% endwith %}
+    </p>
+    <div>
+        <!-- 削除ボタン -->
+        <form action="{% url 'book_delete' book.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">削除</button>
+        </form>
     
+        <!-- 編集ボタン -->
+        <form action="../form/{{ book.id }}/" method="get" style="display:inline;">
+            <button type="submit">編集する</button>
+        </form>
+    
+        <!-- 戻るボタン -->
+        <form action="../" method="get" style="display:inline;">
+            <button type="submit">戻る</button>
+        </form>
+    </div>
 </body>
 </html>
