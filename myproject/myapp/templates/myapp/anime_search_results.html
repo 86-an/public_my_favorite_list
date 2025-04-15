@@ -1,0 +1,25 @@
+<html lang='ja'>
+<head>
+    {% load static %}
+    <meta charset = 'UTF-8'>
+    <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0'>
+    <title>anime_search</title>
+    <link rel = 'stylesheet' href = '{% static "myapp/css/anime_search.css" %}'>
+</head>
+<body>
+    <h2>検索結果</h2>
+    <!-- アニメ検索結果 -->
+    {% if anime_results %}
+        <h3>アニメ</h3>
+        <ul>
+            {% for anime in anime_results %}
+                <li>{{ anime.title }} ({{ anime.title_kana }})</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    
+    <!-- 検索結果がない場合 -->
+    {% if not anime_results and not cast_results %}
+        <p>検索結果が見つかりませんでした。</p>
+    {% endif %}
+</body>

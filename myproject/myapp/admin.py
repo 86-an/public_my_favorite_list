@@ -1,6 +1,6 @@
 from django.contrib import admin
-from import_export.admin import ImportExportModelAdmin
-from .models import Anime, Cast, Staff, BookType, BookGenre, BookStatus, Value, Book, Music
+from import_export.admin import ImportExportModelAdmin, ExportMixin
+from .models import Anime, Cast, Staff, BookType, BookGenre, BookStatus, Value, Book, MusicStatus, Music
 from .resource import AnimeResource, CastResource, StaffResource, MusicResource
 
 #anime関連
@@ -13,20 +13,26 @@ class AnimeAdmin(ImportExportModelAdmin):
 @admin.register(Cast)
 class CastAdmin(ImportExportModelAdmin):
     resource_class = CastResource
-    list_display = ('name', 'get_animes')  # 多対多リレーション用のカスタムメソッド
-    search_fields = ('name', 'animes__title')  # 多対多リレーションのタイトルで検索可能
+    list_display = ('anime_title', 'name')  # アニメタイトルとキャスト名を表示
+    search_fields = ('anime__title', 'name')  # アニメタイトルとキャスト名で検索可能
+    list_filter = ('anime__title',)  # アニメタイトルでフィルタリング
+    ordering = ('anime__title', 'name')  # アニメタイトルとキャスト名で並び替え
 
-    def get_animes(self, obj):
-        return ", ".join([anime.title for anime in obj.animes.all()])
-    get_animes.short_description = 'Animes'
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.select_related('anime')  # ForeignKeyでの関連取得を効率化
 
+    def anime_title(self, obj):
+        return obj.anime.title if obj.anime else "不明なアニメ"
+    anime_title.short_description = 'アニメタイトル'
+    
 @admin.register(Staff)
 class StaffAdmin(ImportExportModelAdmin):
     resource_class = StaffResource
-    list_display = ('name', 'roletext', 'anime_id')
-    search_fields = ('name', 'roletext', 'anime_id__title')
-
-
+    list_display = ('anime_id', 'name', 'roletext')
+    search_fields = ('anime_id', 'name', 'roletext')
+    
+    
 #book関連
 @admin.register(BookType)
 class BookTypeAdmin(admin.ModelAdmin):
@@ -61,8 +67,23 @@ class BookAdmin(admin.ModelAdmin):
         return ", ".join([status.name for status in obj.status.all()])
     display_statuses.short_description = '状態'
 
+#音楽関連
+@admin.register(MusicStatus)
+class MusicStatusAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    
 @admin.register(Music)
 class MusicAdmin(ImportExportModelAdmin):
     resource_class = MusicResource
-    list_display = ['song_name', 'singger', 'writer', 'sing_writer', 'editor', 'song_write']
-    
+    # 管理画面で表示するフィールド
+    list_display = ['song_name', 'singger', 'writer', 'sing_writer', 'editor', 'song_write', 'music_statuses', 'music_values']
+
+    def music_statuses(self, obj):
+        # 状態（ManyToManyField）のリストをカンマ区切りで表示
+        return ", ".join([status.name for status in obj.status.all()])  
+    music_statuses.short_description = '状態'
+
+    def music_values(self, obj):
+        # 評価（ManyToManyField）のリストをカンマ区切りで表示
+        return ", ".join([value.name for value in obj.value.all()])  
+    music_values.short_description = '評価'

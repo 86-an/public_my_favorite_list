@@ -21,6 +21,10 @@ from myapp import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    #anime関連
+    path('anime/form/', views.anime_edit, name='anime_form'),
+    path('anime/form/<int:pk>/', views.anime_edit, name='anime_edit'),
+    path('anime/search/', views.anime_search, name='anime_search'),
     #book関連
     path('book/', views.book_list, name='book_list'),
     path('book/<int:pk>/', views.book_detail, name='book_detail'),

@@ -5,12 +5,112 @@ from django.urls import reverse
 from django.conf import settings
 from django import forms
 from django.db.models import Q
-from .models import Book, Music
-from .forms import BookForm, MusicForm
+from .models import Anime, Cast, Staff, Book, Music
+from .forms import AnimeForm, AnimeSearchForm, CastSearchForm, StaffSearchForm, BookForm, MusicForm
 
 # Create your views here.
 def home(request):
     return render(request, 'myapp/home.html')
+
+
+#anime関連 
+def anime_detail(request, pk=None):
+    anime = get_object_or_404(Anime, pk=pk)
+    casts = Cast.objects.filter(anime = anime).order_by('name')
+    return render(request, 'myapp/anime_detail.html', {'anime' : anime, 'casts' : casts})
+
+
+def anime_edit(request, pk=None):
+    anime = get_object_or_404(Anime, pk = pk)
+    form = AnimeForm(instance = anime)
+    
+    if request.method == 'POST':
+        form = AnimeForm(request.POST, instance = anime)
+        if form.is_valid():
+            print(form.cleaned_data)
+            anime = form.save(commit = False)
+            anime.save()
+            
+            anime.genre.set(form.cleaned_data.get('genres', []))
+            anime.status.set(form.cleaned_data.get('statuses', []))
+            anime.value.set(form.cleaned_data.get('values', []))
+            
+            return HttpResponseRedirect(reverse('anime_detail'))
+
+
+def anime_search(request):
+    anime_form = AnimeSearchForm(request.GET or None, request=request)
+    anime_results = None
+    field_data = []
+    search_query = {}
+
+    # クエリを個別に構築
+    anime_query = Q()
+
+    # Animeフォームの条件追加
+    if anime_form.is_valid():
+        title = anime_form.cleaned_data.get('title')
+        title_kana = anime_form.cleaned_data.get('title_kana')
+        medias = anime_form.cleaned_data.get('medias') 
+        season_year = anime_form.cleaned_data.get('season_year')
+        season_name = anime_form.cleaned_data.get('season_name')
+        genres = anime_form.cleaned_data.get('genres')
+        statuses = anime_form.cleaned_data.get('statuses')
+        values = anime_form.cleaned_data.get('values')
+
+        if title:
+            anime_query &= Q(title__icontains=title)
+            search_query['title'] = title
+        if title_kana:
+            anime_query &= Q(title_kana__icontains=title_kana)
+            search_query['title_kana'] = title_kana
+        if medias:
+            anime_query &= Q(media=medias)
+            search_query['medias'] = medias
+        if season_year:
+            anime_query &= Q(season_year__in=season_year)
+            search_query['season_year'] = season_year
+        if season_name:
+            anime_query &= Q(season_name__in=season_name)
+            search_query['season_name'] = season_name
+        if genres:
+            anime_query &= Q(genre__in=genres)
+            search_query['genres'] = genres
+        if statuses:
+            anime_query &= Q(status__in=statuses)
+            search_query['statuses'] = statuses
+        if values:
+            anime_query &= Q(value__in=values)
+            search_query['values'] = values
+
+        # 検索結果を取得
+        anime_results = Anime.objects.filter(anime_query).distinct()
+
+    # フィールド情報を収集（検索結果表示用）
+    for field in anime_form:
+        field_data.append({
+            'field': field,
+            'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
+            'is_select': isinstance(field.field.widget, forms.Select),
+            'form_name': 'anime_form',
+        })
+
+    # 検索結果がない場合の処理
+    if not anime_results:
+        return render(request, 'myapp/anime_search.html', {
+            'anime_form': anime_form,
+            'anime_results' : anime_results,
+            'field_data': field_data,
+            'search_query': search_query,
+        })
+
+    # 検索結果がある場合
+    return render(request, 'myapp/anime_search_results.html', {
+        'anime_form': anime_form,
+        'anime_results': anime_results,
+        'field_data': field_data,
+        'search_query': search_query,
+    })
 
 
 #book関連
@@ -51,16 +151,16 @@ def book_search(request):
             query &= Q(designer__icontains = designer)
             search_query['designer'] = designer
         if types:
-            query &= Q(types = types)
+            query &= Q(type__in = types)
             search_query['types'] = types
         if genres:
-            query &= Q(genres = genres)
+            query &= Q(genre_in = genres)
             search_query['genres'] = genres
         if statuses:
-            query &= Q(statuses = statuses)
+            query &= Q(status_in = statuses)
             search_query['statuses'] = statuses
         if values:
-            query &= Q(values = values)
+            query &= Q(value_in = values)
             search_query['values'] = values
         
         results =  Book.objects.filter(query).distinct()  
@@ -170,10 +270,10 @@ def music_search(request):
             query &= Q(editor__icontains = editor)
             search_query['editor'] = editor 
         if status:
-            query &= Q(status = status)
+            query &= Q(status_in = status)
             search_query['status'] = status
         if value:
-            query &= Q(value = value)
+            query &= Q(value_in = value)
             search_query['value'] = value                                                
 
         results = Music.objects.filter(query).distinct()

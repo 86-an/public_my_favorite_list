@@ -1,0 +1,35 @@
+{% extends 'base.html' %} {% block title %}検索フォーム{% endblock %}
+
+{% block content %}
+<form method="get" action="{% url 'anime_search' %}">
+    <h2>アニメ検索</h2>
+    {% for field_item in field_data %}
+        {% if field_item.field.name in anime_form.fields %}
+        <div class="mb-3">
+            <label for="{{ field_item.field.id_for_label }}" class="form-label">{{ field_item.field.label }}</label>
+            {% if field_item.is_checkbox %}
+                {% for subwidget in field_item.field %}
+                <div class="form-check">
+                    {{ subwidget.tag }}
+                    <label for="{{ subwidget.id_for_label }}" class="form-check-label">{{ subwidget.choice_label }}</label>
+                </div>
+                {% endfor %}
+            {% elif field_item.is_select %}
+                <select name="{{ field_item.field.name }}" class="form-select">
+                    <option value="">選択してください</option> {# デフォルトの選択肢を追加 #}
+                    {% for value, label in anime_form.fields.medias.choices %}
+                        <option value="{{ value }}" {% if search_query.medias == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                {{ field_item.field }}
+            {% endif %}
+        </div>
+        {% endif %}
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">検索</button>
+</form>
+{% endblock %}

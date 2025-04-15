@@ -1,4 +1,5 @@
 from import_export import resources, fields
+from import_export.widgets import ForeignKeyWidget
 from .models import Anime, Cast, Staff, Music
 import logging
 
@@ -20,44 +21,46 @@ class AnimeResource(resources.ModelResource):
 
 
 class CastResource(resources.ModelResource):
-    anime_id = fields.Field(attribute='anime_id', column_name='anime_id')  # カラム名指定
+    anime_id = fields.Field(
+        column_name='anime_id',
+        attribute='anime',
+        widget=ForeignKeyWidget(Anime, 'anime_id')
+    )
     name = fields.Field(attribute='name', column_name='name')
-    
+
     def before_import_row(self, row, **kwargs):
-        if 'import_type' in row:
-            del row['import_type']
-            logger.info("Removed 'import_type' from row.")
         try:
-            row['anime_id'] = Anime.objects.get(anime_id=row['anime_id']).anime_id
+            anime = Anime.objects.get(anime_id=row['anime_id'])
+            row['anime'] = anime
         except Anime.DoesNotExist:
-            raise ValueError(f"Anime with anime_id '{row['anime_id']}' does not exist.")
-            
+            logger.warning(f"Anime with anime_id '{row['anime_id']}' does not exist. Skipping row.")
+            row['anime'] = None
+
+        # 既存データチェックで上書きを回避
+        if Cast.objects.filter(anime__anime_id=row['anime_id'], name=row['name']).exists():
+            logger.info(f"Cast '{row['name']}' for anime '{row['anime_id']}' already exists. Skipping row.")
+            return None  # スキップ行として処理
+
     class Meta:
         model = Cast
-        fields = ('anime_id', 'name')  # 'id'は含めない
-        import_id_fields = ('anime_id', )  # anime_cast_idを照合基準に
+        fields = ('anime_id', 'name')
+        import_id_fields = ('anime_id', 'name')  # anime_idとnameの組み合わせを基準に識別
 
 
 class StaffResource(resources.ModelResource):
-    anime_staff_id = fields.Field(attribute='anime_staff_id', column_name='anime_staff_id')
-    staff_id = fields.Field(attribute='staff_id', column_name='id')
+    anime = fields.Field(
+        column_name='anime_id',attribute='anime',
+        widget=ForeignKeyWidget(Anime, 'anime_id')  # Animeモデルのanime_idを参照
+    )
+    staff_id = fields.Field(attribute='staff_id', column_name='staff_id')
     name = fields.Field(attribute='name', column_name='name')
     roletext = fields.Field(attribute='roletext', column_name='roleText')
-    anime_id = fields.Field(attribute='anime_id', column_name='anime_id')
-    
-    def before_import_row(self, row, **kwargs):
-        if 'import_type' in row:
-            del row['import_type']
-            logger.info("Removed 'import_type' from row.")
-        try:
-            row['anime_id'] = Anime.objects.get(anime_id=row['anime_id'])
-        except Anime.DoesNotExist:
-            raise ValueError(f"Anime with anime_id '{row['anime_id']}' does not exist.")
         
     class Meta:
         model = Staff
-        fields = ('anime_staff_id', 'anime_id', 'staff_id', 'name', 'roletext')
-        import_id_fields = ('anime_staff_id',)  
+        fields = ('anime_id', 'staff_id', 'name', 'roletext')
+        import_id_fields = ('anime_id',)  
+
 
 class MusicResource(resources.ModelResource):
     song_name = fields.Field(attribute='song_name', column_name='曲名')

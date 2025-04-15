@@ -1,5 +1,26 @@
 from django.db import models
 
+#評価(全クラス共通)モデル
+class Value(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name='評価')
+    
+    def __str__(self):
+        return self.name
+
+#アニメの中間テーブル(form用)    
+class AnimeGenre(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name='分類')
+    
+    def __str__(self):
+        return self.name
+    
+
+class AnimeStatus(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name='状態')
+    
+    def __str__(self):
+        return self.name
+    
 # アニメモデル
 class Anime(models.Model):
     anime_id = models.CharField(max_length=200, unique=True, verbose_name='アニメID')
@@ -8,33 +29,38 @@ class Anime(models.Model):
     media = models.CharField(max_length=200, verbose_name='メディア')
     episodes_count = models.IntegerField(verbose_name='話数', default=0)  # デフォルト値で空を防ぐ
     season_year = models.IntegerField(verbose_name='年', default=0)  # デフォルト値で整合性維持
-    season_name = models.CharField(max_length=200, blank=True, null=True, verbose_name='季節')  # 空データを許容
-
+    season_name = models.CharField(max_length=200, blank=True, null=True, verbose_name='季節')
+    comment = models.CharField(max_length=300, blank=True, null=True, verbose_name='コメント') # 空データを許容
+    genre = models.ManyToManyField(AnimeGenre, verbose_name='ジャンル', blank=True, related_name='animes_genre')
+    status = models.ManyToManyField(AnimeStatus, verbose_name='状態', blank=True, related_name='animes_status')
+    value = models.ManyToManyField(Value, verbose_name='評価', blank=True, related_name='animes_value')
+    
     def __str__(self):
-        return self.title
-
+        return self.title if self.title else "不明なアニメ"
+    
+    
 # キャストモデル リレーション多対多
 class Cast(models.Model):
-    anime_id = models.CharField(max_length=200, unique=True, verbose_name='アニメID', null=True)
+    anime = models.ForeignKey(Anime, on_delete=models.CASCADE,
+                                 related_name='casts', verbose_name="アニメ")
     name = models.CharField(max_length=200, blank=True, null=True, verbose_name='声優名')  # 空のデータを許容
-    animes = models.ManyToManyField('Anime', related_name='casts')  # 多対多リレーション
 
     def __str__(self):
         return self.name if self.name else "不明なキャスト"
 
-# スタッフモデル　リレーション
+# スタッフモデル　
 class Staff(models.Model):
-    anime_staff_id = models.CharField(max_length=200, default='unknown')
+    anime = models.ForeignKey(Anime, on_delete=models.CASCADE, null=True,
+                                 related_name='staff', verbose_name="スタッフ")
     staff_id = models.CharField(max_length=200, blank=True, null=True, verbose_name='スタッフID')  # 空のデータを許容
     name = models.CharField(max_length=200, blank=True, null=True, verbose_name='スタッフ名')  # 空のデータを許容
     roletext = models.CharField(max_length=200, blank=True, null=True, verbose_name='役割')  # 空データを許容
-    anime_id = models.ForeignKey(Anime, to_field='anime_id', on_delete=models.CASCADE, related_name='staff')
 
     def __str__(self):
         return f"{self.name} ({self.roletext})" if self.name else "不明なスタッフ"
 
 
-#book中間テーブル
+#book中間テーブル(form用)
 class BookType(models.Model):
     name = models.CharField(max_length=200, unique=True, verbose_name='分類')
     
@@ -56,11 +82,7 @@ class BookStatus(models.Model):
         return self.name
     
 
-class Value(models.Model):
-    name = models.CharField(max_length=200, unique=True, verbose_name='評価')
-    
-    def __str__(self):
-        return self.name
+
     
 #bookモデル    
 class Book(models.Model):

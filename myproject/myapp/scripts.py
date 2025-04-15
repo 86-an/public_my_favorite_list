@@ -1,8 +1,39 @@
-from myapp.models import BookType, BookGenre, BookStatus, Value, MusicStatus
+from myapp.models import Anime, AnimeGenre, AnimeStatus, BookType, BookGenre, BookStatus, Value, MusicStatus
 
 # Valueのデータ登録
 for name in ['SS', 'S', 'A', 'B', 'C', 'D']:
     Value.objects.get_or_create(name=name)
+    
+#AnimeGenreのデータ登録
+for name in ['SF/ファンタジー', 'ロボット/メカ', 'アクション/バトル', 
+             'コメディ/ギャグ', '恋愛/ラブコメ', '日常/ほのぼの','スポーツ/競技', 'ホラー', 'サスペンス/推理', 
+             '歴史/戦記', '戦争/ミリタリー', 'ドラマ/青春', 'キッズ/ファミリー', 'ショート']:
+    AnimeGenre.objects.get_or_create(name=name)
+
+#AnimeStatusのデータ登録
+for name in ['未視聴', '視聴中', '視聴済み', '気になる']:
+    AnimeStatus.objects.get_or_create(name=name)
+
+#AnimeSearchFormのデータ登録
+MEDIA_CHOICES = [
+    ('TV', 'TV'),
+    ('OVA', 'OVA'),
+    ('MOVIE', 'MOVIE'),
+    ('WEB', 'WEB'),
+    ('OTHER', 'OTHER'),
+]
+
+SEASON_NAME_CHOICES = [
+    ('SPRING', '春'),
+    ('SUMMER', '夏'),
+    ('AUTUMN', '秋'),
+    ('WINTER', '冬'),
+]
+
+SEASON_YEAR_CHOICES = [
+    (year['season_year'], year['season_year'])
+    for year in Anime.objects.values('season_year').distinct()
+]
 
 # BookTypeのデータ登録
 for name in ['小説', 'ライトノベル', '漫画', 'ビジネス本', 'お金']:
