@@ -1,29 +1,8 @@
 from django import forms
 from .models import Anime, AnimeGenre, AnimeStatus, Cast, Book, BookType, BookGenre, BookStatus, Value, Music, MusicStatus
-from .scripts import MEDIA_CHOICES, SEASON_NAME_CHOICES, SEASON_YEAR_CHOICES
 
 #anime検索フォーム
 class AnimeSearchForm(forms.ModelForm):
-    medias = forms.ChoiceField(
-        choices = MEDIA_CHOICES,
-        widget=forms.Select(attrs={'class' : 'form-select'}),
-        label = 'メディア', 
-        required=False,
-    )
-    season_years = forms.MultipleChoiceField(
-        choices = SEASON_YEAR_CHOICES,
-        widget = forms.CheckboxSelectMultiple(attrs = {'class' : 'form-check-input'}),
-        label = '放送年度',
-        required = False,
-    )
-    
-    season_names = forms.MultipleChoiceField(
-        choices = SEASON_NAME_CHOICES,
-        widget = forms.CheckboxSelectMultiple(attrs = {'class' : 'form-check-input'}),
-        label = '放送時期',
-        required = False,
-    )
-    
     genres = forms.ModelMultipleChoiceField(
         queryset = AnimeGenre.objects.all(),
         widget = forms.CheckboxSelectMultiple(attrs = {'class' : 'form-check-input'}),
@@ -47,12 +26,23 @@ class AnimeSearchForm(forms.ModelForm):
     
     class Meta:
         model = Anime
-        fields = ['title', 'title_kana']
+        fields = ['title', 'title_kana', 'media', 'season_year', 'season_name', 'genres', 'statuses', 'values']
         widgets = {
             'title' : forms.TextInput(attrs = {'class' : 'form-control',
                                                'placeholder' : 'タイトルを入力してください'}),
             'title_kana' : forms.TextInput(attrs = {'class' : 'form-control',
                                                'placeholder' : 'タイトルカナを入力してください'}),
+            'media' : forms.TextInput(attrs = {'class' : 'form-control',
+                                               'placeholder' : 'メディアを入力してください'}),
+            'season_year' : forms.NumberInput(attrs = {'class' : 'form-control',
+                                               'placeholder' : '放送年度を入力してください'}),
+            'season_name' : forms.TextInput(attrs = {'class' : 'form-control',
+                                               'placeholder' : '季節を入力してください'}),
+        }
+        labels = {
+            'media' : 'メディア　TV MOVIE OVA WEB OTHER ',
+            'season_year' : '放送年度を半角で',
+            'season_name' : '季節を全角で　SPRING SUMMER AUTUMN WINTER',
         }
     
     def __init__(self, *args, **kwargs):
@@ -63,9 +53,6 @@ class AnimeSearchForm(forms.ModelForm):
             self.fields['genres'].initial = self.instance.genre.all()
             self.fields['statuses'].initial = self.instance.status.all()
             self.fields['values'].initial = self.instance.value.all()
-        
-        if request:
-            self.fields['medias'].initial = request.GET.get('medias', '')
 
 
 class CastSearchForm(forms.ModelForm):    

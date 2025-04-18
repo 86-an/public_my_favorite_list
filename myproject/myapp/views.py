@@ -7,7 +7,9 @@ from django import forms
 from django.db.models import Q
 from .models import Anime, Cast, Staff, Book, Music
 from .forms import AnimeForm, AnimeSearchForm, CastSearchForm, StaffSearchForm, BookForm, MusicForm
+import logging
 
+logger = logging.getLogger(__name__)
 # Create your views here.
 def home(request):
     return render(request, 'myapp/home.html')
@@ -44,34 +46,35 @@ def anime_search(request):
     field_data = []
     search_query = {}
 
-    # クエリを個別に構築
-    anime_query = Q()
-
+    if not anime_form.is_valid():
+        logger.info("データを受け取れませんでした")
     # Animeフォームの条件追加
     if anime_form.is_valid():
         title = anime_form.cleaned_data.get('title')
         title_kana = anime_form.cleaned_data.get('title_kana')
-        medias = anime_form.cleaned_data.get('medias') 
+        media = anime_form.cleaned_data.get('media')
         season_year = anime_form.cleaned_data.get('season_year')
         season_name = anime_form.cleaned_data.get('season_name')
         genres = anime_form.cleaned_data.get('genres')
         statuses = anime_form.cleaned_data.get('statuses')
         values = anime_form.cleaned_data.get('values')
-
+        
+    # クエリを個別に構築
+        anime_query = Q()
         if title:
             anime_query &= Q(title__icontains=title)
             search_query['title'] = title
         if title_kana:
             anime_query &= Q(title_kana__icontains=title_kana)
             search_query['title_kana'] = title_kana
-        if medias:
-            anime_query &= Q(media=medias)
-            search_query['medias'] = medias
+        if media:
+            anime_query &= Q(media__icontains=media)
+            search_query['media'] = media
         if season_year:
-            anime_query &= Q(season_year__in=season_year)
+            anime_query &= Q(season_year__icontains=season_year)
             search_query['season_year'] = season_year
         if season_name:
-            anime_query &= Q(season_name__in=season_name)
+            anime_query &= Q(season_name__incontains=season_name)
             search_query['season_name'] = season_name
         if genres:
             anime_query &= Q(genre__in=genres)
@@ -87,30 +90,37 @@ def anime_search(request):
         anime_results = Anime.objects.filter(anime_query).distinct()
 
     # フィールド情報を収集（検索結果表示用）
-    for field in anime_form:
-        field_data.append({
-            'field': field,
-            'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
-            'is_select': isinstance(field.field.widget, forms.Select),
-            'form_name': 'anime_form',
-        })
-
-    # 検索結果がない場合の処理
-    if not anime_results:
-        return render(request, 'myapp/anime_search.html', {
+        for field in anime_form:
+            field_data.append({
+                'field': field,
+                'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
+                'form_name': 'anime_form',
+            })
+            
+        # 検索結果がある場合
+        return render(request, 'myapp/anime_search_results.html', {
             'anime_form': anime_form,
-            'anime_results' : anime_results,
+            'anime_results': anime_results,
             'field_data': field_data,
             'search_query': search_query,
         })
-
-    # 検索結果がある場合
-    return render(request, 'myapp/anime_search_results.html', {
+        
+    for field in anime_form:
+        field_data.append({
+        'field': field,
+        'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
+        'form_name': 'anime_form',
+    })
+    
+    # 検索結果がない場合の処理
+    return render(request, 'myapp/anime_search.html', {
         'anime_form': anime_form,
-        'anime_results': anime_results,
+        'anime_results' : anime_results,
         'field_data': field_data,
         'search_query': search_query,
     })
+
+
 
 
 #book関連
@@ -154,13 +164,13 @@ def book_search(request):
             query &= Q(type__in = types)
             search_query['types'] = types
         if genres:
-            query &= Q(genre_in = genres)
+            query &= Q(genre__in = genres)
             search_query['genres'] = genres
         if statuses:
-            query &= Q(status_in = statuses)
+            query &= Q(status__in = statuses)
             search_query['statuses'] = statuses
         if values:
-            query &= Q(value_in = values)
+            query &= Q(value__in = values)
             search_query['values'] = values
         
         results =  Book.objects.filter(query).distinct()  

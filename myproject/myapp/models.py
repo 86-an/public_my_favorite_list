@@ -24,11 +24,11 @@ class AnimeStatus(models.Model):
 # アニメモデル
 class Anime(models.Model):
     anime_id = models.CharField(max_length=200, unique=True, verbose_name='アニメID')
-    title = models.CharField(max_length=200, verbose_name='タイトル')
+    title = models.CharField(max_length=200, blank=True, null=True, verbose_name='タイトル')
     title_kana = models.CharField(max_length=200, blank=True, null=True, verbose_name='タイトルカナ')  # 空データを許容
-    media = models.CharField(max_length=200, verbose_name='メディア')
+    media = models.CharField(max_length=200, blank=True, null=True, verbose_name='メディア')
     episodes_count = models.IntegerField(verbose_name='話数', default=0)  # デフォルト値で空を防ぐ
-    season_year = models.IntegerField(verbose_name='年', default=0)  # デフォルト値で整合性維持
+    season_year = models.IntegerField(verbose_name='年', blank=True, null=True, )  # デフォルト値で整合性維持
     season_name = models.CharField(max_length=200, blank=True, null=True, verbose_name='季節')
     comment = models.CharField(max_length=300, blank=True, null=True, verbose_name='コメント') # 空データを許容
     genre = models.ManyToManyField(AnimeGenre, verbose_name='ジャンル', blank=True, related_name='animes_genre')
