@@ -4,7 +4,7 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>book_list</title>
     <link rel="stylesheet" href="{% static 'myapp/css/book_list.css' %}"> <!-- 修正済み -->
 </head>
 <body>
@@ -12,10 +12,16 @@
     <ul>
         {% for book in books %}
         <li>
-            <a href="{{ book.id }}/">{{ book.title }}</a>
+            <a href="{{ book.id }}/">{{ book.title }}-{{ book.author }}</a>
         </li>
         {% endfor %}
     </ul>
-    <a href="form/">新しい本を追加</a>
+    <div class = "group">
+        <a href="{% url  'book_form' %}" class = "button">追加</a>
+        <a href="{% url  'book_search' %}" class = "button">検索</a>
+        <a href="{% url  'home' %}" class = "button">Home</a>
+    </div>
+    
+    
 </body>
 </html>

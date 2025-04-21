@@ -8,15 +8,9 @@
     <link rel="stylesheet" href="{% static 'myapp/css/music_detail.css' %}">
 </head>
 <body>
-    <h1>{{ music.song_name }}</h1>
-    <p>歌手: {{ music.singger }}</p>
-    <p>作曲家: {{ music.writer }}</p>
-    <p>作詞家: {{ music.sing_writer }}</p>
-    <p>編曲者: {{ music.editor }}</p>
-    <p>歌詞: {{music.song_write }}</p>
-
+    <h1>{{ music.song_name }} &nbsp; &nbsp; &nbsp; 歌手: {{ music.singger }}</h1>
     <!-- 評価 -->
-    <p>評価: 
+    <h3>評価: 
         {% with music.value.all as value_list %}
             {% if value_list %}
                 {{ value_list|join:", " }}
@@ -24,10 +18,10 @@
                 評価はありません
             {% endif %}
         {% endwith %}
-    </p>
+    </h3>
 
     <!-- 分類 -->
-    <p>状態: 
+    <h3>状態: 
         {% with music.status.all as status_list %}
             {% if status_list %}
                 {{ status_list|join:", " }}
@@ -35,9 +29,14 @@
                 状態はありません
             {% endif %}
         {% endwith %}
-    </p>
+    </h3>
 
-    <div>
+    <p>作曲家: {{ music.writer }}</p>
+    <p>作詞家: {{ music.sing_writer }}</p>
+    <p>編曲者: {{ music.editor }}</p>
+    <p>歌詞: {{music.song_write }}</p>
+
+    <div class="group">
         <!-- 削除ボタン -->
         <form action="{% url 'music_delete' music.id %}" method="post" style="display:inline;">
             {% csrf_token %}

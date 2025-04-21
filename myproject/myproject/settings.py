@@ -132,3 +132,26 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'myapp', 'static')]
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+import logging
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",  # ← `DEBUG` にすると `logger.info()` も出力される！
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",  # ← `INFO` を最低限セット！
+            "propagate": True,
+        },
+    },
+}

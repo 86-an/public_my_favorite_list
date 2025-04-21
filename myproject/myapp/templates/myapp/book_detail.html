@@ -8,13 +8,9 @@
     <link rel="stylesheet" href="{% static 'myapp/css/book_detail.css' %}">
 </head>
 <body>
-    <h1>{{ book.title }}</h1>
-    <p>著者: {{ book.author }}</p>
-    <p>絵師: {{ book.designer }}</p>
-    <p>巻数: {{ book.series }}</p>
-
+    <h1>{{ book.title }} &nbsp; &nbsp; &nbsp; 著者: {{ book.author }}</h1>
     <!-- 評価 -->
-    <p>評価: 
+    <h3>評価: 
         {% with book.value.all as value_list %}
             {% if value_list %}
                 {{ value_list|join:", " }}
@@ -22,10 +18,10 @@
                 評価はありません
             {% endif %}
         {% endwith %}
-    </p>
+    </h3>
 
     <!-- 分類 -->
-    <p>分類: 
+    <h3>分類: 
         {% with book.type.all as type_list %}
             {% if type_list %}
                 {{ type_list|join:", " }}
@@ -33,10 +29,10 @@
                 分類はありません
             {% endif %}
         {% endwith %}
-    </p>
+    </h3>
 
     <!-- ジャンル -->
-    <p>ジャンル: 
+    <h3>ジャンル: 
         {% with book.genre.all as genre_list %}
             {% if genre_list %}
                 {{ genre_list|join:", " }}
@@ -44,10 +40,10 @@
                 ジャンルはありません
             {% endif %}
         {% endwith %}
-    </p>
+    </h3>
 
     <!-- 状態 -->
-    <p>状態: 
+    <h3>状態: 
         {% with book.status.all as status_list %}
             {% if status_list %}
                 {{ status_list|join:", " }}
@@ -55,8 +51,12 @@
                 状態はありません
             {% endif %}
         {% endwith %}
-    </p>
-    <div>
+    </h3>
+
+    <p>絵師: {{ book.designer }}</p>
+    <p>巻数: {{ book.series }}</p>
+
+    <div class = 'group'>
         <!-- 削除ボタン -->
         <form action="{% url 'book_delete' book.id %}" method="post" style="display:inline;">
             {% csrf_token %}

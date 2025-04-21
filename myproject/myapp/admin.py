@@ -29,8 +29,13 @@ class CastAdmin(ImportExportModelAdmin):
 @admin.register(Staff)
 class StaffAdmin(ImportExportModelAdmin):
     resource_class = StaffResource
-    list_display = ('anime_id', 'name', 'roletext')
-    search_fields = ('anime_id', 'name', 'roletext')
+    list_display = ('anime', 'staff_id', 'name', 'get_roletext')  # `get_roletext` を追加
+    search_fields = ('anime', 'staff_id', 'name', 'get_roletext') 
+    
+    def get_roletext(self, obj):
+        return obj.roletext if obj.roletext else "(データなし)"
+    
+    get_roletext.short_description = "役割"
     
     
 #book関連

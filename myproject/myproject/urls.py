@@ -23,8 +23,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     #anime関連
-    path('anime/form/', views.anime_edit, name='anime_form'),
-    path('anime/form/<int:pk>/', views.anime_edit, name='anime_edit'),
+    path('anime/<int:pk>/', views.anime_detail, name='anime_detail'),
+    path('anime/form/', views.anime_form, name='anime_form'),
+    path('anime/form/<int:pk>/', views.anime_form, name='anime_edit'),
+    path('delete/<int:anime_id>/', views.anime_delete, name='anime_delete'),
     path('anime/search/', views.anime_search, name='anime_search'),
     #book関連
     path('book/', views.book_list, name='book_list'),

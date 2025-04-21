@@ -12,10 +12,14 @@
     <ul>
         {% for music in musics %}
         <li>
-            <a href="{{ music.id }}/">{{ music.song_name }}</a>
+            <a href="{{ music.id }}/">{{ music.song_name }} - {{ music.singger}}</a>
         </li>
         {% endfor %}
     </ul>
-    <a href="form/">新しい音楽を追加</a>
+    <div class = "group">
+        <a href="{% url  'music_form' %}" class = "button">追加</a>
+        <a href="{% url  'music_search' %}" class = "button">検索</a>
+        <a href="{% url  'home' %}" class = "button">Home</a>
+    </div>
 </body>
 </html>

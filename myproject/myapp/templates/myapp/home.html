@@ -13,9 +13,8 @@
         <!-- アニメ -->
         <div class = "group">
             <img src = "{% static 'myapp/image/anime.png' %}" alt = "アニメ">
-            <button class = "button">一覧  &amp; 編集</button>
-            <button class = "button">検索</button>
-            <button class = "button">新規登録</button>
+            <a href="{% url 'anime_search' %}" class = "button">検索</a>
+            <a href="{% url 'anime_form' %}" class = "button">新規登録</a>
         </div>
 
         <!-- 本 -->

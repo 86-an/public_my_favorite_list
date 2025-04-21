@@ -51,7 +51,7 @@ class Cast(models.Model):
 # スタッフモデル　
 class Staff(models.Model):
     anime = models.ForeignKey(Anime, on_delete=models.CASCADE, null=True,
-                                 related_name='staff', verbose_name="スタッフ")
+                                 related_name='staff', verbose_name="アニメ")
     staff_id = models.CharField(max_length=200, blank=True, null=True, verbose_name='スタッフID')  # 空のデータを許容
     name = models.CharField(max_length=200, blank=True, null=True, verbose_name='スタッフ名')  # 空のデータを許容
     roletext = models.CharField(max_length=200, blank=True, null=True, verbose_name='役割')  # 空データを許容

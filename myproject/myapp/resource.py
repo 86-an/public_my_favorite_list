@@ -46,20 +46,38 @@ class CastResource(resources.ModelResource):
         fields = ('anime_id', 'name')
         import_id_fields = ('anime_id', 'name')  # anime_idとnameの組み合わせを基準に識別
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class StaffResource(resources.ModelResource):
-    anime = fields.Field(
-        column_name='anime_id',attribute='anime',
+    anime_id = fields.Field(
+        column_name='anime_id',
+        attribute='anime',
         widget=ForeignKeyWidget(Anime, 'anime_id')  # Animeモデルのanime_idを参照
     )
     staff_id = fields.Field(attribute='staff_id', column_name='staff_id')
     name = fields.Field(attribute='name', column_name='name')
     roletext = fields.Field(attribute='roletext', column_name='roleText')
-        
+
+    def before_import_row(self, row, **kwargs):
+        try:
+            anime = Anime.objects.get(anime_id=row['anime_id'])
+            row['anime'] = anime
+        except Anime.DoesNotExist:
+            logger.warning(f"Anime with anime_id '{row['anime_id']}' does not exist. Skipping row.")
+            row['anime'] = None
+
+        # 既存データチェックで上書きを回避
+        if Staff.objects.filter(anime__anime_id=row['anime_id'], staff_id=row['staff_id']).exists():
+            logger.info(f"Staff '{row['staff_id']}' for anime '{row['anime_id']}' already exists. Skipping row.")
+            return None  # スキップ行として処理
+
     class Meta:
         model = Staff
         fields = ('anime_id', 'staff_id', 'name', 'roletext')
-        import_id_fields = ('anime_id',)  
+        import_id_fields = ('anime_id', 'staff_id',)  # anime_idとnameの組み合わせを基準に識別
+         
 
 
 class MusicResource(resources.ModelResource):

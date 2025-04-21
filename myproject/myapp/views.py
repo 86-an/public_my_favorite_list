@@ -18,26 +18,45 @@ def home(request):
 #anime関連 
 def anime_detail(request, pk=None):
     anime = get_object_or_404(Anime, pk=pk)
-    casts = Cast.objects.filter(anime = anime).order_by('name')
-    return render(request, 'myapp/anime_detail.html', {'anime' : anime, 'casts' : casts})
+    return render(request, 'myapp/anime_detail.html', {'anime' : anime})
 
 
-def anime_edit(request, pk=None):
-    anime = get_object_or_404(Anime, pk = pk)
-    form = AnimeForm(instance = anime)
-    
-    if request.method == 'POST':
-        form = AnimeForm(request.POST, instance = anime)
-        if form.is_valid():
-            print(form.cleaned_data)
-            anime = form.save(commit = False)
+def anime_form(request, pk=None):
+    if pk:  # pkが指定されている場合、編集モード
+        anime = get_object_or_404(Anime, pk=pk)
+        anime_form = AnimeSearchForm(instance=anime)
+    else:  # pkがない場合、新規作成モード
+        anime = None
+        anime_form = AnimeSearchForm()
+
+    if request.method == 'POST':  # POSTリクエストの場合、フォームを保存
+        anime_form = AnimeSearchForm(request.POST, instance=anime)
+        if anime_form.is_valid():
+            print(anime_form.cleaned_data)
+            anime = anime_form.save(commit=False)
             anime.save()
-            
-            anime.genre.set(form.cleaned_data.get('genres', []))
-            anime.status.set(form.cleaned_data.get('statuses', []))
-            anime.value.set(form.cleaned_data.get('values', []))
-            
-            return HttpResponseRedirect(reverse('anime_detail'))
+            anime_form.save_m2m()  # この行を追加
+
+            # ManyToManyFieldに手動で関連付けを追加
+            anime.genre.set(anime_form.cleaned_data.get('genres', []))
+            anime.status.set(anime_form.cleaned_data.get('statuses', []))
+            anime.value.set(anime_form.cleaned_data.get('values', []))
+
+            return HttpResponseRedirect(reverse('anime_search'))  # リダイレクト
+
+    # 各フィールドの情報を追加
+    field_data = []
+    for field in anime_form:
+        field_data.append({
+            'field': field,
+            'name': field.name,
+            'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
+            'is_select': isinstance(field.field.widget, forms.Select),
+            'form_name': 'anime_form',
+        })
+
+    # テンプレートに渡す
+    return render(request, 'myapp/anime_form.html', {'field_data': field_data, 'anime': anime}) # 'anime' を追加
 
 
 def anime_search(request):
@@ -52,7 +71,7 @@ def anime_search(request):
     if anime_form.is_valid():
         title = anime_form.cleaned_data.get('title')
         title_kana = anime_form.cleaned_data.get('title_kana')
-        media = anime_form.cleaned_data.get('media')
+        medias = anime_form.cleaned_data.get('medias')
         season_year = anime_form.cleaned_data.get('season_year')
         season_name = anime_form.cleaned_data.get('season_name')
         genres = anime_form.cleaned_data.get('genres')
@@ -67,14 +86,14 @@ def anime_search(request):
         if title_kana:
             anime_query &= Q(title_kana__icontains=title_kana)
             search_query['title_kana'] = title_kana
-        if media:
-            anime_query &= Q(media__icontains=media)
-            search_query['media'] = media
+        if medias:
+            anime_query &= Q(media=medias)
+            search_query['medias'] = medias
         if season_year:
-            anime_query &= Q(season_year__icontains=season_year)
+            anime_query &= Q(season_year=season_year)
             search_query['season_year'] = season_year
         if season_name:
-            anime_query &= Q(season_name__incontains=season_name)
+            anime_query &= Q(season_name=season_name)
             search_query['season_name'] = season_name
         if genres:
             anime_query &= Q(genre__in=genres)
@@ -87,13 +106,14 @@ def anime_search(request):
             search_query['values'] = values
 
         # 検索結果を取得
-        anime_results = Anime.objects.filter(anime_query).distinct()
+        anime_results = Anime.objects.filter(anime_query).distinct().order_by('title')
 
     # フィールド情報を収集（検索結果表示用）
         for field in anime_form:
             field_data.append({
                 'field': field,
                 'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
+                'is_select' : isinstance(field.field.widget, forms.Select),
                 'form_name': 'anime_form',
             })
             
@@ -109,6 +129,7 @@ def anime_search(request):
         field_data.append({
         'field': field,
         'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
+        'is_select' : isinstance(field.field.widget, forms.Select),
         'form_name': 'anime_form',
     })
     
@@ -120,17 +141,20 @@ def anime_search(request):
         'search_query': search_query,
     })
 
-
-
-
 #book関連
 def book_list(request):
-    books = Book.objects.all()
+    books = Book.objects.all().order_by("author")
     return render(request, 'myapp/book_list.html', {'books' : books})
 
 def book_detail(request, pk=None):
     book = get_object_or_404(Book, pk=pk)
     return render(request, 'myapp/book_detail.html', {'book' : book})
+
+@require_POST
+def anime_delete(request, book_id):
+    anime = get_object_or_404(Anime, id=book_id)
+    anime.delete()
+    return redirect('anime_search')
 
 def book_search(request):
     form = BookForm(request.GET or None, request = request)
@@ -173,7 +197,7 @@ def book_search(request):
             query &= Q(value__in = values)
             search_query['values'] = values
         
-        results =  Book.objects.filter(query).distinct()  
+        results =  Book.objects.filter(query).distinct().order_by('author')  
         
         for field in form:
             field_data.append({
@@ -234,7 +258,7 @@ def book_form(request, pk=None):
 
 #music関連
 def music_list(request):
-    musics = Music.objects.all()
+    musics = Music.objects.all().order_by("singger")
     return render(request, 'myapp/music_list.html', {'musics' : musics})
 
 def music_detail(request, pk=None):
@@ -286,7 +310,7 @@ def music_search(request):
             query &= Q(value_in = value)
             search_query['value'] = value                                                
 
-        results = Music.objects.filter(query).distinct()
+        results = Music.objects.filter(query).distinct().order_by('singger')
         for field in form:
             field_data.append({
                 'field' : field,

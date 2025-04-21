@@ -1,0 +1,20 @@
+.group {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    margin-top: 20px;
+    padding: 20px;
+}
+
+button {
+    display: flex;
+    margin: 10px auto;
+    padding: 12px 18px;
+    font-size: 16px;
+    color: #fff !important;
+    background-color: #007BFF !important; /* ボタンのデフォルト色 */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* ホバー時のアニメーション */
+}

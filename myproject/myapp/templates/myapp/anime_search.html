@@ -1,4 +1,5 @@
-{% extends 'base.html' %} <!-- 上部テンプレートを拡張 -->
+{% extends 'base.html' %}
+{% load my_filters %} {# ここを追加 #}
 
 {% block title %}検索フォーム{% endblock %}
 
@@ -9,19 +10,27 @@
         <div class="mb-3">
             <label for="{{ field_item.field.id_for_label }}" class="form-label">{{ field_item.field.label }}</label>
             {% if field_item.is_checkbox %}
-                <!-- チェックボックスの場合 -->
                 {% for subwidget in field_item.field %}
                     <div class="form-check">
                         {{ subwidget.tag }}
                         <label for="{{ subwidget.id_for_label }}" class="form-check-label">{{ subwidget.choice_label }}</label>
                     </div>
                 {% endfor %}
+            {% elif field_item.is_select %}
+                <select name="{{ field_item.field.name }}" class="form-select">
+                    <option value="">選択してください</option> {# デフォルトの選択肢を追加 #}
+                    {% for value, label in field_item.field.field.choices %}
+                        <option value="{{ value }}" {% if search_query|get_item:field_item.field.name == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
             {% else %}
-                <!-- 通常のフィールド -->
                 {{ field_item.field }}
             {% endif %}
         </div>
     {% endfor %}
     <button type="submit" class="btn btn-primary">検索</button>
 </form>
+
 {% endblock %}

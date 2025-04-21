@@ -13,7 +13,9 @@
         <h3>アニメ</h3>
         <ul>
             {% for anime in anime_results %}
-                <li>{{ anime.title }} ({{ anime.title_kana }})</li>
+                <li>
+                    <a href="{% url 'anime_detail' anime.id %}">{{ anime.title }}</a>
+                </li>
             {% endfor %}
         </ul>
     {% endif %}
