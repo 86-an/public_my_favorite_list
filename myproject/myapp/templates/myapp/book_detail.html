@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Detail</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/book_detail.css' %}">
+</head>
+<body>
+    <h1>{{ book.title }} &nbsp; &nbsp; &nbsp; 著者: {{ book.author }}</h1>
+    <!-- 評価 -->
+    <h3>評価: 
+        {% with book.value.all as value_list %}
+            {% if value_list %}
+                {{ value_list|join:", " }}
+            {% else %}
+                評価はありません
+            {% endif %}
+        {% endwith %}
+    </h3>
+
+    <!-- 分類 -->
+    <h3>分類: 
+        {% with book.type.all as type_list %}
+            {% if type_list %}
+                {{ type_list|join:", " }}
+            {% else %}
+                分類はありません
+            {% endif %}
+        {% endwith %}
+    </h3>
+
+    <!-- ジャンル -->
+    <h3>ジャンル: 
+        {% with book.genre.all as genre_list %}
+            {% if genre_list %}
+                {{ genre_list|join:", " }}
+            {% else %}
+                ジャンルはありません
+            {% endif %}
+        {% endwith %}
+    </h3>
+
+    <!-- 状態 -->
+    <h3>状態: 
+        {% with book.status.all as status_list %}
+            {% if status_list %}
+                {{ status_list|join:", " }}
+            {% else %}
+                状態はありません
+            {% endif %}
+        {% endwith %}
+    </h3>
+
+    <p>絵師: {{ book.designer }}</p>
+    <p>巻数: {{ book.series }}</p>
+
+    <div class = 'group'>
+        <!-- 削除ボタン -->
+        <form action="{% url 'book_delete' book.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">削除</button>
+        </form>
+    
+        <!-- 編集ボタン -->
+        <form action="../form/{{ book.id }}/" method="get" style="display:inline;">
+            <button type="submit">編集する</button>
+        </form>
+    
+        <!-- 戻るボタン -->
+        <form action="../" method="get" style="display:inline;">
+            <button type="submit">戻る</button>
+        </form>
+    </div>
+</body>
+</html>

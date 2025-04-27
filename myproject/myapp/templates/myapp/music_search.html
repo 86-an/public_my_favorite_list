@@ -1,0 +1,27 @@
+{% extends 'base.html' %} <!-- 上部テンプレートを拡張 -->
+
+{% block title %}検索フォーム{% endblock %}
+
+{% block content %}
+<h1>検索フォーム</h1>
+<form method="get" action="{% url 'music_search' %}">
+    {% for field_item in field_data %}
+        <div class="mb-3">
+            <label for="{{ field_item.field.id_for_label }}" class="form-label">{{ field_item.field.label }}</label>
+            {% if field_item.is_checkbox %}
+                <!-- チェックボックスの場合 -->
+                {% for subwidget in field_item.field %}
+                    <div class="form-check">
+                        {{ subwidget.tag }}
+                        <label for="{{ subwidget.id_for_label }}" class="form-check-label">{{ subwidget.choice_label }}</label>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- 通常のフィールド -->
+                {{ field_item.field }}
+            {% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">検索</button>
+</form>
+{% endblock %}

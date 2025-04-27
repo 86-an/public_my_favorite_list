@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load my_filters %}
+
+{% block title %}検索フォーム{% endblock %}
+
+{% block content %}
+<h1>検索フォーム</h1>
+
+<!-- アニメ検索フォーム -->
+<h2>アニメ検索</h2>
+<form method="get" action="{% url 'anime_search' %}">
+    {% for field_item in field_data %}
+        {% if field_item.form_name == "anime_form" %}
+            <div class="mb-3">
+                <label for="{{ field_item.field.id_for_label }}" class="form-label">{{ field_item.field.label }}</label>
+                {% if field_item.is_checkbox %}
+                    {% for subwidget in field_item.field %}
+                        <div class="form-check">
+                            {{ subwidget.tag }}
+                            <label for="{{ subwidget.id_for_label }}" class="form-check-label">{{ subwidget.choice_label }}</label>
+                        </div>
+                    {% endfor %}
+                {% elif field_item.is_select %}
+                    <select name="{{ field_item.field.name }}" class="form-select">
+                        <option value="">選択してください</option>
+                        {% for value, label in field_item.field.field.choices %}
+                            <option value="{{ value }}" {% if search_query|get_item:field_item.field.name == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    {{ field_item.field }}
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">アニメを検索</button>
+</form>
+<br>
+<!-- キャスト検索フォーム -->
+<h2>キャスト検索</h2>
+<form method="get" action="{% url 'anime_search' %}">
+    {% for field_item in field_data %}
+        {% if field_item.form_name == "cast_form" %}
+            <div class="mb-3">
+                <label for="{{ field_item.field.id_for_label }}" class="form-label">{{ field_item.field.label }}</label>
+                {{ field_item.field }}
+            </div>
+        {% endif %}
+    {% endfor %}
+    <button type="submit" class="btn btn-secondary">キャストを検索</button>
+</form>
+<br>
+<!-- スタッフ検索フォーム -->
+<h2>スタッフ検索</h2>
+<form method="get" action="{% url 'anime_search' %}">
+    {% for field_item in field_data %}
+        {% if field_item.form_name == "staff_form" %}
+            <div class="mb-3">
+                <label for="{{ field_item.field.id_for_label }}" class="form-label">{{ field_item.field.label }}</label>
+                {{ field_item.field }}
+            </div>
+        {% endif %}
+    {% endfor %}
+    <button type="submit" class="btn btn-info">スタッフを検索</button>
+</form>
+
+{% endblock %}

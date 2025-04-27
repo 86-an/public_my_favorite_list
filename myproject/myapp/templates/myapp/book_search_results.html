@@ -1,0 +1,39 @@
+<html lang='ja'>
+<head>
+    {% load static %}
+    <meta charset = 'UTF-8'>
+    <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0'>
+    <title>book_search</title>
+    <link rel = 'stylesheet' href = '{% static "myapp/css/book_search_results.css" %}'>
+</head>
+<body>
+    <h1>検索結果</h1>
+    <p>検索キーワード: "{{ search_query }}"</p>
+    {% if results %}
+        <ul>
+            {% for book in results %}
+                <li>
+                    <a href="{% url 'book_detail' book.id %}">{{ book.title }} - {{ book.author }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>該当するデータが見つかりませんでした。</p>
+    {% endif %}
+    <div class="pagination">
+        {% if results.has_previous %}
+            <a href="?page={{ results.previous_page_number }}&{{ query_string }}">前へ</a>
+        {% endif %}
+    
+        <span>ページ {{ results.number }} / {{ results.paginator.num_pages }}</span>
+    
+        {% if results.has_next %}
+            <a href="?page={{ results.next_page_number }}&{{ query_string }}">次へ</a>
+        {% endif %}
+    </div>
+    <div class = "group">
+        <a href="{% url  'book_form' %}" class = "button">追加</a>
+        <a href="{% url  'book_search' %}" class = "button">検索</a>
+        <a href="{% url  'home' %}" class = "button">Home</a>
+    </div>
+</body>

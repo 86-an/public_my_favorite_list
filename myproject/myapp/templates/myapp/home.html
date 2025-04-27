@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/home.css' %}"> <!-- 修正済み -->
+</head>
+<body>
+    <h1>マイリスト</h1>
+    <div class = "container">
+        <!-- アニメ -->
+        <div class = "group">
+            <img src = "{% static 'myapp/image/anime.png' %}" alt = "アニメ">
+            <a href="{% url 'anime_list' %}" class = "button">一覧  &amp; 編集</a>
+            <a href="{% url 'anime_search' %}" class = "button">検索</a>
+            <a href="{% url 'anime_form' %}" class = "button">新規登録</a>
+        </div>
+
+        <!-- 本 -->
+        <div class = "group">
+            <img src = "{% static 'myapp/image/book.png' %}" alt = "本">
+            <a href="{% url 'book_list' %}" class = "button">一覧  &amp; 編集</a>
+            <a href="{% url 'book_search' %}" class = "button">検索</a>
+            <a href="{% url 'book_form' %}" class = "button">新規登録</a>
+        </div>
+
+        <!-- 音楽 -->
+        <div class = "group">
+            <img src = "{% static 'myapp/image/music.png' %}" alt = "音楽">
+            <a href="{% url 'music_list' %}" class = "button">一覧  &amp; 編集</a>
+            <a href="{% url 'music_search' %}" class = "button">検索</a>
+            <a href="{% url 'music_form' %}" class = "button">新規登録</a>
+        </div>
+    </div>
+</body>
+</html>

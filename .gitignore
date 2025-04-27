@@ -1,0 +1,4 @@
+*.db
+venv/
+media/
+myapp/myproject/settings.py

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Detail</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/book_detail.css' %}">
+</head>
+<body>
+    <h1>{{ anime.title }}</h1>
+        <!-- 分類 -->
+        <h3>分類: 
+            {% with anime.status.all as status_list %}
+                {% if status_list %}
+                    {{ status_list|join:", " }}
+                {% else %}
+                    分類はありません
+                {% endif %}
+            {% endwith %}
+        </h3>
+    
+        <!-- ジャンル -->
+        <h3>ジャンル: 
+            {% with anime.genre.all as genre_list %}
+                {% if genre_list %}
+                    {{ genre_list|join:", " }}
+                {% else %}
+                    ジャンルはありません
+                {% endif %}
+            {% endwith %}
+        </h3>
+        <!-- 評価 -->
+        <h3>評価: 
+            {% with anime.value.all as value_list %}
+                {% if value_list %}
+                    {{ value_list|join:", " }}
+                {% else %}
+                    評価はありません
+                {% endif %}
+            {% endwith %}
+        </h3>
+    <p>メディア: {{ anime.media }}</p>
+    <p>話数: {{ anime.episodes_count }}</p>
+    <p>放送年度: {{ anime.season_year }}</p>
+    <p>季節： {{ anime.season_name}}
+
+    <h2>キャスト</h2>
+    <ul>
+        {% for cast in anime.casts.all %}
+            <li>{{ cast.name }}</li>
+        {% empty %}
+            <li>キャストは登録していません</li>
+        {% endfor %}
+    </ul>
+
+    <h2>スタッフ</h2>
+    <ul>
+        {% for staff_name_roletext in anime.staff.all %}
+            <li>{{ staff_name_roletext.roletext }} : {{ staff_name_roletext.name }}</li>
+        {% empty %}
+            <li>キャストは登録していません</li>
+        {% endfor %}
+    </ul>
+
+    <div class = 'group'>
+        <!-- 削除ボタン -->
+        <form action="{% url 'anime_delete' anime.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">削除</button>
+        </form>    
+        <!-- 編集ボタン -->
+        <form action="../form/{{ anime.id }}/" method="get" style="display:inline;">
+            <button type="submit">編集する</button>
+        </form>
+    
+        <!-- 戻るボタン -->
+        <form action="{% url 'home' %}" method="get" style="display:inline;">
+            <button type="submit">戻る</button>
+        </form>
+    </div>
+</body>
+</html>

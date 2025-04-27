@@ -1,0 +1,36 @@
+{% extends 'base.html' %} <!-- 親テンプレートを継承 -->
+
+{% block title %}Anime Form{% endblock %} <!-- タイトルを指定 -->
+
+{% block content %} <!-- コンテンツを挿入 -->
+<h1>Anime フォーム</h1>
+
+<form method="post">
+    {% csrf_token %} {# CSRFトークンを追加 #}
+    {% for field_item in field_data %}
+        <div class="mb-3">
+            <label for="{{ field_item.field.id_for_label }}" class="form-label">{{ field_item.field.label }}</label>
+            {% if field_item.is_checkbox %}
+                {% for subwidget in field_item.field %}
+                    <div class="form-check">
+                        {{ subwidget.tag }}
+                        <label for="{{ subwidget.id_for_label }}" class="form-check-label">{{ subwidget.choice_label }}</label>
+                    </div>
+                {% endfor %}
+            {% elif field_item.is_select %}
+                <select name="{{ field_item.field.name }}" class="form-select">
+                    <option value="">選択してください</option> {# デフォルトの選択肢を追加 #}
+                    {% for value, label in field_item.field.field.choices %}
+                        <option value="{{ value }}" {% if field_item.field.value == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                {{ field_item.field }}
+            {% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">保存</button>
+</form>
+{% endblock %}
