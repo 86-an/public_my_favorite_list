@@ -4,18 +4,35 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Music List</title>
     <link rel="stylesheet" href="{% static 'myapp/css/music_list.css' %}"> <!-- 修正済み -->
 </head>
 <body>
     <h1>音楽のリスト</h1>
     <ul>
-        {% for music in musics %}
-        <li>
-            <a href="{{ music.id }}/">{{ music.song_name }} - {{ music.singger}}</a>
-        </li>
+        {% for music in page_obj.object_list %}
+            <li>
+                <a href="{% url 'music_detail' music.id %}">{{ music.song_name }} - {{ music.singger }}</a>
+            </li>
         {% endfor %}
     </ul>
+
+    <!-- ページネーションのリンク -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">最初</a>
+            <a href="?page={{ page_obj.previous_page_number }}">前へ</a>
+        {% endif %}
+
+        <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">次へ</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">最後</a>
+        {% endif %}
+    </div>
+
+    <!-- リンクボタン-->
     <div class = "group">
         <a href="{% url  'music_form' %}" class = "button">追加</a>
         <a href="{% url  'music_search' %}" class = "button">検索</a>

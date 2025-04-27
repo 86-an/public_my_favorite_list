@@ -45,6 +45,24 @@
     <p>放送年度: {{ anime.season_year }}</p>
     <p>季節： {{ anime.season_name}}
 
+    <h2>キャスト</h2>
+    <ul>
+        {% for cast in anime.casts.all %}
+            <li>{{ cast.name }}</li>
+        {% empty %}
+            <li>キャストは登録していません</li>
+        {% endfor %}
+    </ul>
+
+    <h2>スタッフ</h2>
+    <ul>
+        {% for staff_name_roletext in anime.staff.all %}
+            <li>{{ staff_name_roletext.roletext }} : {{ staff_name_roletext.name }}</li>
+        {% empty %}
+            <li>キャストは登録していません</li>
+        {% endfor %}
+    </ul>
+
     <div class = 'group'>
         <!-- 削除ボタン -->
         <form action="{% url 'anime_delete' anime.id %}" method="post" style="display:inline;">

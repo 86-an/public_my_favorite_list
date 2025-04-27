@@ -1,3 +1,7 @@
+ul {
+    column-count : 2;
+}
+
 .group {
     display: flex;
     justify-content: space-around;

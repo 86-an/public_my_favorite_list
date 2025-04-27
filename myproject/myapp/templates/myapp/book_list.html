@@ -8,14 +8,31 @@
     <link rel="stylesheet" href="{% static 'myapp/css/book_list.css' %}"> <!-- 修正済み -->
 </head>
 <body>
-    <h1>本のリスト</h1>
+    <h1>本の一覧</h1>
     <ul>
-        {% for book in books %}
-        <li>
-            <a href="{{ book.id }}/">{{ book.title }}-{{ book.author }}</a>
-        </li>
+        {% for book in page_obj.object_list %}
+            <li>
+                <a href="{% url 'book_detail' book.id %}">{{ book.title }} - {{ book.author }}</a>
+            </li>
         {% endfor %}
     </ul>
+
+    <!-- ページネーションのリンク -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">最初</a>
+            <a href="?page={{ page_obj.previous_page_number }}">前へ</a>
+        {% endif %}
+
+        <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">次へ</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">最後</a>
+        {% endif %}
+    </div>
+    
+    <!-- リンクボタン-->
     <div class = "group">
         <a href="{% url  'book_form' %}" class = "button">追加</a>
         <a href="{% url  'book_search' %}" class = "button">検索</a>

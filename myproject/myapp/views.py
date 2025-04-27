@@ -3,21 +3,29 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.conf import settings
+from django.core.paginator import Paginator
 from django import forms
 from django.db.models import Q
 from .models import Anime, Cast, Staff, Book, Music
 from .forms import AnimeForm, AnimeSearchForm, CastSearchForm, StaffSearchForm, BookForm, MusicForm
 import logging
+from urllib.parse import urlencode
 
 logger = logging.getLogger(__name__)
 # Create your views here.
 def home(request):
     return render(request, 'myapp/home.html')
 
+def anime_list(request):
+    anime_queryset = Anime.objects.all()
+    paginator = Paginator(anime_queryset, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'myapp/anime_list.html', {'page_obj' : page_obj})
 
-#anime関連 
+#anime関連 (詳細、フォーム、検索)
 def anime_detail(request, pk=None):
-    anime = get_object_or_404(Anime, pk=pk)
+    anime = get_object_or_404(Anime.objects.prefetch_related('casts', 'staff'), pk=pk)
     return render(request, 'myapp/anime_detail.html', {'anime' : anime})
 
 
@@ -59,16 +67,20 @@ def anime_form(request, pk=None):
     return render(request, 'myapp/anime_form.html', {'field_data': field_data, 'anime': anime}) # 'anime' を追加
 
 
+
 def anime_search(request):
     anime_form = AnimeSearchForm(request.GET or None, request=request)
-    anime_results = None
+    cast_form = CastSearchForm(request.GET or None)
+    staff_form = StaffSearchForm(request.GET or None)
+    anime_results, cast_results, staff_results = None, None, None
     field_data = []
     search_query = {}
+    search_executed = False
+    anime_query = Q()
 
-    if not anime_form.is_valid():
-        logger.info("データを受け取れませんでした")
-    # Animeフォームの条件追加
-    if anime_form.is_valid():
+    # アニメ検索処理
+    if anime_form.is_valid() and any(anime_form.cleaned_data.values()):
+        search_executed = True
         title = anime_form.cleaned_data.get('title')
         title_kana = anime_form.cleaned_data.get('title_kana')
         medias = anime_form.cleaned_data.get('medias')
@@ -78,8 +90,6 @@ def anime_search(request):
         statuses = anime_form.cleaned_data.get('statuses')
         values = anime_form.cleaned_data.get('values')
         
-    # クエリを個別に構築
-        anime_query = Q()
         if title:
             anime_query &= Q(title__icontains=title)
             search_query['title'] = title
@@ -87,13 +97,13 @@ def anime_search(request):
             anime_query &= Q(title_kana__icontains=title_kana)
             search_query['title_kana'] = title_kana
         if medias:
-            anime_query &= Q(media=medias)
+            anime_query &= Q(media__icontains=medias)
             search_query['medias'] = medias
         if season_year:
-            anime_query &= Q(season_year=season_year)
+            anime_query &= Q(season_year__icontains=medias)
             search_query['season_year'] = season_year
         if season_name:
-            anime_query &= Q(season_name=season_name)
+            anime_query &= Q(season_name__icontains=medias)
             search_query['season_name'] = season_name
         if genres:
             anime_query &= Q(genre__in=genres)
@@ -104,47 +114,104 @@ def anime_search(request):
         if values:
             anime_query &= Q(value__in=values)
             search_query['values'] = values
-
-        # 検索結果を取得
-        anime_results = Anime.objects.filter(anime_query).distinct().order_by('title')
-
-    # フィールド情報を収集（検索結果表示用）
-        for field in anime_form:
-            field_data.append({
-                'field': field,
-                'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
-                'is_select' : isinstance(field.field.widget, forms.Select),
-                'form_name': 'anime_form',
-            })
             
-        # 検索結果がある場合
-        return render(request, 'myapp/anime_search_results.html', {
-            'anime_form': anime_form,
-            'anime_results': anime_results,
-            'field_data': field_data,
-            'search_query': search_query,
-        })
+    # キャスト検索処理
+    if cast_form.is_valid() and any(cast_form.cleaned_data.values()):
+        search_executed = True
+        cast_query = Q()
+        cast_name = cast_form.cleaned_data.get('cast_name')
+
+        if cast_name:
+            cast_query &= Q(name__icontains=cast_name)
+            search_query['cast_name'] = cast_name
+
+        cast_results = Cast.objects.filter(cast_query).distinct().order_by('name')
+
+        if cast_results.exists():
+            anime_query &= Q(casts__in=cast_results)
+
+    # スタッフ検索処理
+    if staff_form.is_valid() and any(staff_form.cleaned_data.values()):
+        search_executed = True
+        staff_query = Q()
+        staff_name = staff_form.cleaned_data.get('staff_name')
+
+        if staff_name:
+            staff_query &= Q(name__icontains=staff_name)
+            search_query['staff_name'] = staff_name
+
+        staff_results = Staff.objects.filter(staff_query).distinct().order_by('name')
+
+        if staff_results.exists():
+            anime_query &= Q(staff__in=staff_results)
+
+    # 検索が実行された場合のみアニメ結果を取得
+    if search_executed:
+        anime_results = Anime.objects.filter(anime_query).distinct().order_by('title')
         
+        # 🔹 ページネーション処理を追加
+        paginator = Paginator(anime_results, 15) 
+        page_number = request.GET.get('page')
+        anime_results = paginator.get_page(page_number)
+
+        current_query = request.GET.copy()
+        if 'page' in current_query:
+            current_query.pop('page')
+        query_string = current_query.urlencode()
+        
+    # フォームのフィールド情報を収集
     for field in anime_form:
         field_data.append({
-        'field': field,
-        'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
-        'is_select' : isinstance(field.field.widget, forms.Select),
-        'form_name': 'anime_form',
-    })
-    
-    # 検索結果がない場合の処理
+            'field': field,
+            'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
+            'is_select': isinstance(field.field.widget, forms.Select),
+            'form_name': 'anime_form',
+        })
+    for field in cast_form:
+        field_data.append({
+            'field': field,
+            'is_checkbox': isinstance(field.field.widget, forms.CheckboxSelectMultiple),
+            'is_select': isinstance(field.field.widget, forms.Select),
+            'form_name': 'cast_form',
+        })
+    for field in staff_form:
+        field_data.append({
+            'field': field,
+            'form_name': 'staff_form',
+        })
+
+    # 結果ページをレンダリング
+    if search_executed:
+        return render(request, 'myapp/anime_search_results.html', {
+            'anime_form': anime_form,
+            'cast_form': cast_form,
+            'staff_form': staff_form,
+            'anime_results': anime_results,  # ページネーションされた結果
+            'cast_results': cast_results,
+            'staff_results': staff_results,
+            'field_data': field_data,
+            'search_query': search_query,
+            'query_string' : query_string,
+        })
+
+    # 検索されていない場合のページ
     return render(request, 'myapp/anime_search.html', {
         'anime_form': anime_form,
-        'anime_results' : anime_results,
+        'cast_form': cast_form,
+        'staff_form': staff_form,
+        'anime_results': anime_results,
+        'cast_results': cast_results,
         'field_data': field_data,
         'search_query': search_query,
     })
 
-#book関連
+#book関連（一覧、詳細、削除、検索）
 def book_list(request):
-    books = Book.objects.all().order_by("author")
-    return render(request, 'myapp/book_list.html', {'books' : books})
+    book_queryset = Book.objects.all().order_by("author")
+    paginator = Paginator(book_queryset, 30)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'myapp/book_list.html', {'page_obj' : page_obj})
 
 def book_detail(request, pk=None):
     book = get_object_or_404(Book, pk=pk)
@@ -198,13 +265,22 @@ def book_search(request):
             search_query['values'] = values
         
         results =  Book.objects.filter(query).distinct().order_by('author')  
+        paginator = Paginator(results, 30)
+        page_number = request.GET.get('page')
+        results = paginator.get_page(page_number)
+        
+        current_query = request.GET.copy()
+        if 'page' in current_query:
+            current_query.pop('page')
+        query_string = current_query.urlencode()
         
         for field in form:
             field_data.append({
                 'field' : field,
                 'is_checkbox' : isinstance(field.field.widget, forms.CheckboxSelectMultiple)
             })
-        return render(request, 'myapp/book_search_results.html', {'form' : form, 'results' : results, 'field_data' : field_data, 'search_query' : search_query})
+        return render(request, 'myapp/book_search_results.html', {'form' : form, 'results' : results, 'field_data' : field_data, 
+                                                                  'search_query' : search_query, 'query_string' : query_string})
     
     for field in form:
         field_data.append({
@@ -256,10 +332,14 @@ def book_form(request, pk=None):
     return render(request, 'myapp/book_form.html', {'field_data': field_data})
 
 
-#music関連
+#music関連（一覧、詳細、削除、検索）
 def music_list(request):
     musics = Music.objects.all().order_by("singger")
-    return render(request, 'myapp/music_list.html', {'musics' : musics})
+    paginator = Paginator(musics, 30)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'myapp/music_list.html', {'page_obj' : page_obj})
+    
 
 def music_detail(request, pk=None):
     music = get_object_or_404(Music, pk=pk)
@@ -311,6 +391,16 @@ def music_search(request):
             search_query['value'] = value                                                
 
         results = Music.objects.filter(query).distinct().order_by('singger')
+        paginator = Paginator(results, 30)
+        page_number = request.GET.get('page')
+        results = paginator.get_page(page_number)
+        
+        current_query = request.GET.copy()
+        if 'page' in current_query:
+            current_query.pop('page')
+            current_query.pop('page')
+        query_string = current_query.urlencode()
+        
         for field in form:
             field_data.append({
                 'field' : field,
@@ -318,7 +408,7 @@ def music_search(request):
             })
         
         return render(request, 'myapp/music_search_results.html', 
-                      {'form' : form, 'results' : results, 'field_data' : field_data, 'search_query' : search_query})
+                      {'form' : form, 'results' : results, 'field_data' : field_data, 'search_query' : search_query, 'query_string' : query_string})
     
     for field in form:
         field_data.append({

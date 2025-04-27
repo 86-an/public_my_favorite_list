@@ -20,6 +20,19 @@
     {% else %}
         <p>該当するデータが見つかりませんでした。</p>
     {% endif %}
+
+    <div class="pagination">
+        {% if results.has_previous %}
+            <a href="?page={{ results.previous_page_number }}&{{ query_string }}">前へ</a>
+        {% endif %}
+    
+        <span>ページ {{ results.number }} / {{ results.paginator.num_pages }}</span>
+    
+        {% if results.has_next %}
+            <a href="?page={{ results.next_page_number }}&{{ query_string }}">次へ</a>
+        {% endif %}
+    </div>
+    
     <div class = "group">
         <a href="{% url  'music_form' %}" class = "button">追加</a>
         <a href="{% url  'music_search' %}" class = "button">検索</a>

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Anime, AnimeGenre, AnimeStatus, Cast, Book, BookType, BookGenre, BookStatus, Value, Music, MusicStatus
+from .models import Anime, AnimeGenre, AnimeStatus, Cast, Staff, Book, BookType, BookGenre, BookStatus, Value, Music, MusicStatus
 from .scripts import MEDIA_CHOICES, SEASON_YEAR_CHOICES, SEASON_NAME_CHOICES
 import logging
 
@@ -72,26 +72,19 @@ class AnimeSearchForm(forms.ModelForm):
             self.fields['values'].initial = self.instance.value.all()
 
 
-class CastSearchForm(forms.ModelForm):    
-    class Meta:
-        model = Cast
-        fields = ['name']
-        widgets = {
-            'name' : forms.TextInput(attrs = {'class' : 'form-control',
-                                               'placeholder' : '声優名を入力してください'}),
-        }
-        
-    def __init__(self, *args, **kwargs):
-        request = kwargs.pop('request', None)
-        super().__init__(*args, **kwargs)
-        
-        
-class StaffSearchForm(forms.ModelForm):
-    staff_name = forms.CharField(
-        max_length=200,
+class CastSearchForm(forms.Form):    
+    cast_name = forms.CharField(
         required=False,
-        label="スタッフ名",
-        widget=forms.TextInput(attrs={'placeholder': 'スタッフ名を入力'})
+        label='声優名',
+        widget=forms.TextInput(attrs={'class' : 'form-control', 'placeholder' : '声優名を入れてください'})
+    )
+        
+        
+class StaffSearchForm(forms.Form):
+    staff_name = forms.CharField(
+        required=False,
+        label='スタッフ名前・役職・会社名',
+        widget=forms.TextInput(attrs={'class' : 'form-control', 'placeholder' : 'スタッフ名前・役職・会社名を入れてください'})
     )
 
         
@@ -206,7 +199,7 @@ class MusicForm(forms.ModelForm):
     
     class Meta:
         model = Music
-        fields = ['song_name', 'singger', 'writer','sing_writer', 'editor', 'song_write']
+        fields = ['song_name', 'singger', 'writer','sing_writer', 'editor']
         widgets = {
             'song_name' : forms.TextInput(attrs={'class' : 'form-control',
                                                  'placeholder' : '曲名を入力して下さい'}),
@@ -218,8 +211,6 @@ class MusicForm(forms.ModelForm):
                                                    'placeholder' : '作詞家名を入力してください'}),
             'editor' : forms.TextInput(attrs={'class' : 'form-control',
                                               'placeholder' : '編曲者名を入力してください'}),
-            'song_write' : forms.TextInput(attrs={'class' : 'form-control',
-                                                  'placeholder' : '歌詞を入力してください' }),
         }
     
     def __init__(self, *args, **kwargs):

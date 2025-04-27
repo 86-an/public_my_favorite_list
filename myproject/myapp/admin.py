@@ -13,7 +13,7 @@ class AnimeAdmin(ImportExportModelAdmin):
 @admin.register(Cast)
 class CastAdmin(ImportExportModelAdmin):
     resource_class = CastResource
-    list_display = ('anime_title', 'name')  # アニメタイトルとキャスト名を表示
+    list_display = ('anime__title', 'name')  # アニメタイトルとキャスト名を表示
     search_fields = ('anime__title', 'name')  # アニメタイトルとキャスト名で検索可能
     list_filter = ('anime__title',)  # アニメタイトルでフィルタリング
     ordering = ('anime__title', 'name')  # アニメタイトルとキャスト名で並び替え
@@ -21,21 +21,16 @@ class CastAdmin(ImportExportModelAdmin):
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         return queryset.select_related('anime')  # ForeignKeyでの関連取得を効率化
-
-    def anime_title(self, obj):
-        return obj.anime.title if obj.anime else "不明なアニメ"
-    anime_title.short_description = 'アニメタイトル'
     
 @admin.register(Staff)
 class StaffAdmin(ImportExportModelAdmin):
     resource_class = StaffResource
-    list_display = ('anime', 'staff_id', 'name', 'get_roletext')  # `get_roletext` を追加
-    search_fields = ('anime', 'staff_id', 'name', 'get_roletext') 
+    list_display = ('anime__title', 'staff_id', 'name', 'roletext')  # `get_roletext` を追加
+    search_fields = ('anime__title', 'staff_id', 'name', 'roletext') 
     
-    def get_roletext(self, obj):
-        return obj.roletext if obj.roletext else "(データなし)"
-    
-    get_roletext.short_description = "役割"
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.select_related('anime')  # ForeignKeyでの関連取得を効率化
     
     
 #book関連

@@ -5,7 +5,7 @@
 {% block content %} <!-- コンテンツを挿入 -->
 <h1>Anime フォーム</h1>
 
-<form method="post" action="{% url 'anime_edit' pk=anime.pk %}">
+<form method="post">
     {% csrf_token %} {# CSRFトークンを追加 #}
     {% for field_item in field_data %}
         <div class="mb-3">

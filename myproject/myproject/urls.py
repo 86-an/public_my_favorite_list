@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     #anime関連
+    path('anime/', views.anime_list, name='anime_list'),
     path('anime/<int:pk>/', views.anime_detail, name='anime_detail'),
     path('anime/form/', views.anime_form, name='anime_form'),
     path('anime/form/<int:pk>/', views.anime_form, name='anime_edit'),

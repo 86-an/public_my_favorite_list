@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>anime_list</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/anime_list.css' %}"> <!-- 修正済み -->
+</head>
+<body>
+    <h1>アニメ一覧</h1>
+    <ul>
+        {% for anime in page_obj.object_list %}
+            <li>
+                <a href="{% url 'anime_detail' anime.id %}">{{ anime.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- ページネーションのリンク -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">最初</a>
+            <a href="?page={{ page_obj.previous_page_number }}">前へ</a>
+        {% endif %}
+
+        <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">次へ</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">最後</a>
+        {% endif %}
+    </div>
+
+    <!-- リンクボタン-->
+    <div class = "group">
+        <a href="{% url  'anime_form' %}" class = "button">追加</a>
+        <a href="{% url  'anime_search' %}" class = "button">検索</a>
+        <a href="{% url  'home' %}" class = "button">Home</a>
+    </div>
+</body>
+</html>

@@ -4,7 +4,7 @@
     <meta charset = 'UTF-8'>
     <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0'>
     <title>anime_search</title>
-    <link rel = 'stylesheet' href = '{% static "myapp/css/anime_search.css" %}'>
+    <link rel = 'stylesheet' href = '{% static "myapp/css/anime_search_results.css" %}'>
 </head>
 <body>
     <h2>検索結果</h2>
@@ -19,9 +19,27 @@
             {% endfor %}
         </ul>
     {% endif %}
+    <div class="pagination">
+        {% if anime_results.has_previous %}
+            <a href="?page={{ anime_results.previous_page_number }}&{{ query_string }}">前へ</a>
+        {% endif %}
     
+        <span>ページ {{ anime_results.number }} / {{ anime_results.paginator.num_pages }}</span>
+    
+        {% if anime_results.has_next %}
+            <a href="?page={{ anime_results.next_page_number }}&{{ query_string }}">次へ</a>
+        {% endif %}
+    </div>
+
     <!-- 検索結果がない場合 -->
     {% if not anime_results and not cast_results %}
         <p>検索結果が見つかりませんでした。</p>
     {% endif %}
+
+    <!-- urlボタン-->
+    <div class = "group">
+        <a href="{% url  'anime_form' %}" class = "button">追加</a>
+        <a href="{% url  'anime_search' %}" class = "button">検索</a>
+        <a href="{% url  'home' %}" class = "button">Home</a>
+    </div>
 </body>

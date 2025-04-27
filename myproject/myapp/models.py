@@ -21,6 +21,7 @@ class AnimeStatus(models.Model):
     def __str__(self):
         return self.name
     
+    
 # アニメモデル
 class Anime(models.Model):
     anime_id = models.CharField(max_length=200, unique=True, verbose_name='アニメID')
@@ -60,6 +61,7 @@ class Staff(models.Model):
         return f"{self.name} ({self.roletext})" if self.name else "不明なスタッフ"
 
 
+
 #book中間テーブル(form用)
 class BookType(models.Model):
     name = models.CharField(max_length=200, unique=True, verbose_name='分類')
@@ -82,8 +84,6 @@ class BookStatus(models.Model):
         return self.name
     
 
-
-    
 #bookモデル    
 class Book(models.Model):
     title = models.CharField(max_length=200, blank=True, null=True, verbose_name='タイトル')
@@ -94,6 +94,7 @@ class Book(models.Model):
     series = models.IntegerField(verbose_name='巻数', default=1)
     status = models.ManyToManyField(BookStatus, verbose_name='状態', related_name='books_status')
     value = models.ManyToManyField(Value, verbose_name='評価', blank=True, related_name='books_value')
+
 
 
 #音楽の中間モデル

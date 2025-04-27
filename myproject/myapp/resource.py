@@ -91,6 +91,6 @@ class MusicResource(resources.ModelResource):
     class Meta:
         model = Music
         fields = ('song_name', 'singger', 'writer', 'sing_writer', 'editor', 'song_write')
-        import_id_fields = ('song_name',)
+        import_id_fields = ('song_name','singger',)
     
     
