@@ -1,5 +1,5 @@
 from django import forms
-from .models import Anime, AnimeGenre, AnimeStatus, Cast, Staff, Book, BookType, BookGenre, BookStatus, Value, Music, MusicStatus
+from .models import Anime, AnimeGenre, AnimeStatus, Cast, Staff, Book, BookType, BookGenre, BookStatus, Value
 from .scripts import MEDIA_CHOICES, SEASON_YEAR_CHOICES, SEASON_NAME_CHOICES
 import logging
 
@@ -178,45 +178,4 @@ class BookForm(forms.ModelForm):
             self.fields['types'].initial = self.instance.type.all()
             self.fields['genres'].initial = self.instance.genre.all()
             self.fields['statuses'].initial = self.instance.status.all()
-            self.fields['values'].initial = self.instance.value.all()
-
-
-#musicフォーム
-class MusicForm(forms.ModelForm):
-    status = forms.ModelMultipleChoiceField(
-        queryset = MusicStatus.objects.all(),
-        widget = forms.CheckboxSelectMultiple(attrs = {'class' : 'form-check-input'}),
-        label = '状態',
-        required = False
-    )
-    
-    values = forms.ModelMultipleChoiceField(
-        queryset = Value.objects.all(),
-        widget = forms.CheckboxSelectMultiple(attrs={'class' : 'form-check=input'}),
-        label='評価',
-        required = False
-    )
-    
-    class Meta:
-        model = Music
-        fields = ['song_name', 'singger', 'writer','sing_writer', 'editor']
-        widgets = {
-            'song_name' : forms.TextInput(attrs={'class' : 'form-control',
-                                                 'placeholder' : '曲名を入力して下さい'}),
-            'singger' : forms.TextInput(attrs={'class' : 'form-control',
-                                               'placeholder' : '歌手名を入力してください'}),
-            'writer' : forms.TextInput(attrs={'class' : 'form-control',
-                                              'placeholder' : '作曲家名を入力してください'}),
-            'sing_writer' : forms.TextInput(attrs={'class' : 'form-control',
-                                                   'placeholder' : '作詞家名を入力してください'}),
-            'editor' : forms.TextInput(attrs={'class' : 'form-control',
-                                              'placeholder' : '編曲者名を入力してください'}),
-        }
-    
-    def __init__(self, *args, **kwargs):
-        request = kwargs.pop('request', None)
-        super().__init__(*args, **kwargs)
-        
-        if self.instance and self.instance.pk:
-            self.fields['status'].initial = self.instance.status.all()
             self.fields['values'].initial = self.instance.value.all()

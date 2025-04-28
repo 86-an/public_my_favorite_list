@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin, ExportMixin
-from .models import Anime, Cast, Staff, BookType, BookGenre, BookStatus, Value, Book, MusicStatus, Music
-from .resource import AnimeResource, CastResource, StaffResource, MusicResource
+from .models import Anime, Cast, Staff, BookType, BookGenre, BookStatus, Value, Book
+from .resource import AnimeResource, CastResource, StaffResource
 
 #anime関連
 @admin.register(Anime)
@@ -66,24 +66,3 @@ class BookAdmin(admin.ModelAdmin):
     def display_statuses(self, obj):
         return ", ".join([status.name for status in obj.status.all()])
     display_statuses.short_description = '状態'
-
-#音楽関連
-@admin.register(MusicStatus)
-class MusicStatusAdmin(admin.ModelAdmin):
-    list_display = ['name']
-    
-@admin.register(Music)
-class MusicAdmin(ImportExportModelAdmin):
-    resource_class = MusicResource
-    # 管理画面で表示するフィールド
-    list_display = ['song_name', 'singger', 'writer', 'sing_writer', 'editor', 'song_write', 'music_statuses', 'music_values']
-
-    def music_statuses(self, obj):
-        # 状態（ManyToManyField）のリストをカンマ区切りで表示
-        return ", ".join([status.name for status in obj.status.all()])  
-    music_statuses.short_description = '状態'
-
-    def music_values(self, obj):
-        # 評価（ManyToManyField）のリストをカンマ区切りで表示
-        return ", ".join([value.name for value in obj.value.all()])  
-    music_values.short_description = '評価'
