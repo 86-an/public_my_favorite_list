@@ -27,21 +27,21 @@ urlpatterns = [
     path('anime/<int:pk>/', views.anime_detail, name='anime_detail'),
     path('anime/form/', views.anime_form, name='anime_form'),
     path('anime/form/<int:pk>/', views.anime_form, name='anime_edit'),
-    path('delete/<int:anime_id>/', views.anime_delete, name='anime_delete'),
+    path('anime/delete/<int:anime_id>/', views.anime_delete, name='anime_delete'),
     path('anime/search/', views.anime_search, name='anime_search'),
     #book関連
     path('book/', views.book_list, name='book_list'),
     path('book/<int:pk>/', views.book_detail, name='book_detail'),
     path('book/form/', views.book_form, name='book_form'),
     path('book/form/<int:pk>/', views.book_form, name='book_edit'),
-    path('delete/<int:book_id>/', views.book_delete, name='book_delete'),
+    path('book/delete/<int:book_id>/', views.book_delete, name='book_delete'),
     path('book/search/', views.book_search, name = 'book_search'),
     #music関連
     path('music/', views.music_list, name='music_list'),
     path('music/<int:pk>/', views.music_detail, name = 'music_detail'),
     path('music/form/', views.music_form, name = 'music_form'),
     path('music/form/<int:pk>/', views.music_form, name = 'music_edit'),
-    path('delete/<int:pk>/', views.music_form, name = 'music_delete'),  
+    path('music/delete/<int:pk>/', views.music_form, name = 'music_delete'),  
     path('music/search/', views.music_search, name = 'music_search'),
 ]
 

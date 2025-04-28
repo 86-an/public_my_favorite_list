@@ -66,6 +66,11 @@ def anime_form(request, pk=None):
     # テンプレートに渡す
     return render(request, 'myapp/anime_form.html', {'field_data': field_data, 'anime': anime}) # 'anime' を追加
 
+@require_POST
+def anime_delete(request, anime_id):
+    anime = get_object_or_404(Anime, id=anime_id)
+    anime.delete()
+    return redirect('anime_list')
 
 
 def anime_search(request):
@@ -218,10 +223,10 @@ def book_detail(request, pk=None):
     return render(request, 'myapp/book_detail.html', {'book' : book})
 
 @require_POST
-def anime_delete(request, book_id):
-    anime = get_object_or_404(Anime, id=book_id)
-    anime.delete()
-    return redirect('anime_search')
+def book_delete(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    book.delete()
+    return redirect('book_list')
 
 def book_search(request):
     form = BookForm(request.GET or None, request = request)
